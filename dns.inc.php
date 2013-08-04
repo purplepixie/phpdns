@@ -21,7 +21,7 @@ For more information see www.purplepixie.org/phpdns
 -------------------------------------------------------------- */
 
 //
-// Version 1.00		25th March 2013
+// Version 1.01		4th August 2013
 // David Cutting -- dcutting (some_sort_of_at_sign) purplepixie dot org
 //
 // D Tucny - 2011-06-21 - Add lots more types with RFC references
@@ -45,6 +45,7 @@ For more information see www.purplepixie.org/phpdns
 // D Cutting - 2012-06-22 - Fixed . positioning bug in 0.04
 //
 // Remi Smith - 2013-05-23 - Alternative AAAA IPV6 Patching for 0.02 (included into general build - DC)
+// D Cutting - 2013-08-04 - Implemented bugfix for Serial and TTL provided by Kim Akero
 
 class DNSTypes
 {
@@ -364,7 +365,7 @@ class DNSQuery
 				$responsible=$this->ReadDomainLabel();
 				
 				$buffer=$this->ReadResponse(20);
-				$extras=unpack("nserial/nrefresh/Nretry/Nexpiry/Nminttl",$buffer);
+				$extras=unpack("Nserial/Nrefresh/Nretry/Nexpiry/Nminttl",$buffer); // butfix to NNNNN from nnNNN for 1.01
 				$dot=strpos($responsible,".");
 				$responsible[$dot]="@";
 				$extras['responsible']=$responsible;
