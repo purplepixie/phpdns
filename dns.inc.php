@@ -339,8 +339,10 @@ class DNSQuery
 				$stuff = $this->ReadResponse(4);
 
 				// key type test 21/02/2014 DC
-				$test = unpack("nkey",$stuff);
-				$extras['keytype']=$test['key'];
+				$test = unpack("nflags/cprotocol/calgo",$stuff);
+				$extras['flags']=$test['flags'];
+				$extras['protocol']=$test['protocol'];
+				$extras['algorithm']=$test['algo'];
 
 				$data = base64_encode($this->ReadResponse($ans_header['length'] - 4));
 				$string = $domain." KEY ".$data;
