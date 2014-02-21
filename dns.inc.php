@@ -21,7 +21,7 @@ For more information see www.purplepixie.org/phpdns
 -------------------------------------------------------------- */
 
 //
-// Version 1.01		4th August 2013
+// Version 1.02		21st February 2014
 // David Cutting -- dcutting (some_sort_of_at_sign) purplepixie dot org
 //
 // D Tucny - 2011-06-21 - Add lots more types with RFC references
@@ -46,6 +46,7 @@ For more information see www.purplepixie.org/phpdns
 //
 // Remi Smith - 2013-05-23 - Alternative AAAA IPV6 Patching for 0.02 (included into general build - DC)
 // D Cutting - 2013-08-04 - Implemented bugfix for Serial and TTL provided by Kim Akero
+// D Cutting - 2014-02-21 - Implemented DNSKEY type recovery from data packet
 
 class DNSTypes
 {
@@ -336,6 +337,11 @@ class DNSQuery
 			case "DNSKEY":
 			case "KEY":
 				$stuff = $this->ReadResponse(4);
+
+				// key type test 21/02/2014 DC
+				$test = unpack("nkey",$stuff);
+				$extras['keytype']=$test['key'];
+
 				$data = base64_encode($this->ReadResponse($ans_header['length'] - 4));
 				$string = $domain." KEY ".$data;
 				break;
