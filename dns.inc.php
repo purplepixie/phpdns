@@ -48,6 +48,7 @@ For more information see www.purplepixie.org/phpdns
 // D Cutting - 2013-08-04 - Implemented bugfix for Serial and TTL provided by Kim Akero
 // D Cutting - 2014-02-21 - Implemented DNSKEY type recovery from data packet
 
+
 class DNSTypes
 {
 	var $types_by_id;
@@ -347,7 +348,12 @@ class DNSQuery
 				$data = base64_encode($this->ReadResponse($ans_header['length'] - 4));
 				$string = $domain." KEY ".$data;
 				break;
-
+                        
+                        case "NSEC":
+                                $data=$this->ReadDomainLabel();
+                                $string=$domain." points to ".$data;
+                                break;
+                                
 			case "MX":
 				$prefs=$this->ReadResponse(2);
 				$prefs=unpack("nlevel",$prefs);
