@@ -21,7 +21,7 @@ For more information see www.purplepixie.org/phpdns
 -------------------------------------------------------------- */
 
 //
-// Version 1.02		21st February 2014
+// Version 1.03		19th November 2014
 // David Cutting -- dcutting (some_sort_of_at_sign) purplepixie dot org
 //
 // D Tucny - 2011-06-21 - Add lots more types with RFC references
@@ -47,7 +47,7 @@ For more information see www.purplepixie.org/phpdns
 // Remi Smith - 2013-05-23 - Alternative AAAA IPV6 Patching for 0.02 (included into general build - DC)
 // D Cutting - 2013-08-04 - Implemented bugfix for Serial and TTL provided by Kim Akero
 // D Cutting - 2014-02-21 - Implemented DNSKEY type recovery from data packet
-// D Cutting - 2014-11-19 - Fixed fsockopen bug 
+// D Cutting - 2014-11-19 - Fixed fsockopen bug (BID396) thanks to semperfi on forum
 
 class DNSTypes
 {
