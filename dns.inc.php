@@ -47,6 +47,7 @@ For more information see www.purplepixie.org/phpdns
 // Remi Smith - 2013-05-23 - Alternative AAAA IPV6 Patching for 0.02 (included into general build - DC)
 // D Cutting - 2013-08-04 - Implemented bugfix for Serial and TTL provided by Kim Akero
 // D Cutting - 2014-02-21 - Implemented DNSKEY type recovery from data packet
+// D Cutting - 2014-11-19 - Fixed fsockopen bug 
 
 class DNSTypes
 {
@@ -436,7 +437,9 @@ class DNSQuery
 		if ($this->udp) $host="udp://".$this->server;
 		else $host=$this->server;
 		
-		if (!$socket=fsockopen($host,$this->port,$this->timeout))
+		$errno=0;
+		$errstr="";
+		if (!$socket=fsockopen($host,$this->port,$errno,$errstr,$this->timeout))
 			{
 			$this->SetError("Failed to Open Socket");
 			return false;
