@@ -2,7 +2,7 @@
 /* -------------------------------------------------------------
 This file is the PurplePixie PHP DNS Query Classes
 
-The software is (C) Copyright 2008 PurplePixie Systems
+The software is (C) Copyright 2008-2014 PurplePixie Systems
 
 This is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

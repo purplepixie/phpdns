@@ -2,7 +2,7 @@
 /* -------------------------------------------------------------
 This file is the PurplePixie PHP DNS Query Classes
 
-The software is (C) Copyright 2008-13 PurplePixie Systems
+The software is (C) Copyright 2008-14 PurplePixie Systems
 
 This is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ For more information see www.purplepixie.org/phpdns
 -------------------------------------------------------------- */
 
 //
-// Version 1.03		19th November 2014
+// Version 1.04		30th December 2014
 // David Cutting -- dcutting (some_sort_of_at_sign) purplepixie dot org
 //
 // D Tucny - 2011-06-21 - Add lots more types with RFC references
@@ -48,6 +48,8 @@ For more information see www.purplepixie.org/phpdns
 // D Cutting - 2013-08-04 - Implemented bugfix for Serial and TTL provided by Kim Akero
 // D Cutting - 2014-02-21 - Implemented DNSKEY type recovery from data packet
 // D Cutting - 2014-11-19 - Fixed fsockopen bug (BID396) thanks to semperfi on forum
+// D Cutting - 2014-12-30 - Added stream timeout function (thanks to Jorgen Thomsen) [1.04]
+//                          Also corrected some indentation, added comment and updated copyright
 
 class DNSTypes
 {
@@ -155,7 +157,7 @@ class DNSQuery
 {
 	var $server="";
 	var $port;
-	var $timeout;
+	var $timeout; // default set in constructor
 	var $udp;
 	var $debug;
 	var $binarydebug=false;
@@ -429,10 +431,10 @@ class DNSQuery
 		$this->ClearError();
 		$typeid=$this->types->GetByName($type);
 		if ($typeid===false)
-			{
+		{
 			$this->SetError("Invalid Query Type ".$type);
 			return false;
-			}
+		}
 			
 		if ($this->udp) $host="udp://".$this->server;
 		else $host=$this->server;
@@ -440,20 +442,23 @@ class DNSQuery
 		$errno=0;
 		$errstr="";
 		if (!$socket=fsockopen($host,$this->port,$errno,$errstr,$this->timeout))
-			{
+		{
 			$this->SetError("Failed to Open Socket");
 			return false;
-			}
+		}
+
+		if (function_exists("stream_set_timeout")) // handles timeout on stream read set using timeout as well
+ 			stream_set_timeout($socket, $this->timeout);
 			
 		// Split Into Labels
 		if (preg_match("/[a-z|A-Z]/",$question)==0 && $question!=".") // IP Address
-			{
+		{
 			$labeltmp=explode(".",$question);	// reverse ARPA format
 			for ($i=count($labeltmp)-1; $i>=0; $i--)
 				$labels[]=$labeltmp[$i];
 			$labels[]="IN-ADDR";
 			$labels[]="ARPA";
-			}
+		}
 		else if ($question == ".")
 		{
 			$labels=array("");
@@ -509,7 +514,7 @@ class DNSQuery
 			}
 			
 		if ($this->udp) // UDP method
-			{
+		{
 			if (!fwrite($socket,$header,$headersize))
 				{
 				$this->SetError("Failed to write question to socket");
@@ -522,9 +527,9 @@ class DNSQuery
 				fclose($socket);
 				return false;
 				}				
-			}
+		}
 		else // TCP
-			{
+		{
 			if (!fwrite($socket,$headersizebin)) // write the socket
 				{
 				$this->SetError("Failed to write question length to TCP socket");
@@ -547,12 +552,12 @@ class DNSQuery
 			$datasize=$tmplen['length'];
 			$this->Debug("TCP Stream Length Limit ".$datasize);
 			if (!$this->rawbuffer=fread($socket,$datasize))
-				{
+			{
 				$this->SetError("Failed to read data buffer");
 				fclose($socket);
 				return false;
-				}
 			}
+		}
 		fclose($socket);
 		
 		$buffersize=strlen($this->rawbuffer);
