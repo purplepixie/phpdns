@@ -21,7 +21,7 @@ For more information see www.purplepixie.org/phpdns
 -------------------------------------------------------------- */
 
 //
-// Version 1.04		30th December 2014
+// Version 1.05		30th December 2014
 // David Cutting -- dcutting (some_sort_of_at_sign) purplepixie dot org
 //
 // D Tucny - 2011-06-21 - Add lots more types with RFC references
@@ -50,6 +50,7 @@ For more information see www.purplepixie.org/phpdns
 // D Cutting - 2014-11-19 - Fixed fsockopen bug (BID396) thanks to semperfi on forum
 // D Cutting - 2014-12-30 - Added stream timeout function (thanks to Jorgen Thomsen) [1.04]
 //                          Also corrected some indentation, added comment and updated copyright
+// D Cutting - 2014-12-30 - Corrected error typo (thanks to Jorgen Thomsen) [1.05]
 
 class DNSTypes
 {
@@ -516,38 +517,38 @@ class DNSQuery
 		if ($this->udp) // UDP method
 		{
 			if (!fwrite($socket,$header,$headersize))
-				{
+			{
 				$this->SetError("Failed to write question to socket");
 				fclose($socket);
 				return false;
-				}
+			}
 			if (!$this->rawbuffer=fread($socket,4096)) // read until the end with UDP
-				{
-				$this->SetError("Failed to write read data buffer");
+			{
+				$this->SetError("Failed to read data buffer");
 				fclose($socket);
 				return false;
-				}				
+			}				
 		}
 		else // TCP
 		{
 			if (!fwrite($socket,$headersizebin)) // write the socket
-				{
+			{
 				$this->SetError("Failed to write question length to TCP socket");
 				fclose($socket);
 				return false;
-				}
+			}
 			if (!fwrite($socket,$header,$headersize))
-				{
+			{
 				$this->SetError("Failed to write question to TCP socket");
 				fclose($socket);
 				return false;
-				}
+			}
 			if (!$returnsize=fread($socket,2))
-				{
+			{
 				$this->SetError("Failed to read size from TCP socket");
 				fclose($socket);
 				return false;
-				}
+			}
 			$tmplen=unpack("nlength",$returnsize);
 			$datasize=$tmplen['length'];
 			$this->Debug("TCP Stream Length Limit ".$datasize);
@@ -564,10 +565,10 @@ class DNSQuery
 		$this->Debug("Read Buffer Size ".$buffersize);
 		
 		if ($buffersize<12)
-			{
+		{
 			$this->SetError("Return Buffer too Small");
 			return false;
-			}
+		}
 			
 		$this->rawheader=substr($this->rawbuffer,0,12); // first 12 bytes is the header
 		$this->rawresponse=substr($this->rawbuffer,12); // after that the response
