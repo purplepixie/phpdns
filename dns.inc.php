@@ -404,6 +404,13 @@ class DNSQuery
 				
 				$string=$domain." TEXT \"".$data . "\" (in " . $string_count . " strings)";
 				break;
+				
+			case "NAPTR":
+				$stuff = $this->ReadResponse(4);
+				$extras = unpack("norder/npreference",$stuff);
+				$data = $this->ReadResponse($ans_header['length'] - 4);
+				$string = $domain . " NAPTR " . $data;
+				break;
 
 			default: // something we can't deal with
 				$stuff=$this->ReadResponse($ans_header['length']);
