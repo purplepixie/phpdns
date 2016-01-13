@@ -19,8 +19,10 @@ along with this software.  If not, see www.gnu.org/licenses
 
 For more information see www.purplepixie.org/phpdns
 -------------------------------------------------------------- */
-require("dns.inc.php");
+use PurplePixie\PhpDns\DNSQuery;
+use PurplePixie\PhpDns\DNSTypes;
 
+require 'vendor/autoload.php';
 
 // ** IGNORE THIS - It's just the web form ** //
 if (isset($_REQUEST['server'])) $server=$_REQUEST['server'];
@@ -49,7 +51,7 @@ echo "Query <input type=text name=question size=50 value=\"".$question."\"> ";
 echo "<select name=type>";
 echo "<option value=".$type.">".$type."</option>";
 $types=new DNSTypes();
-$types2=$types->types_by_name;
+$types2=$types->getAllTypesByName();
 ksort($types2);
 foreach ($types2 as $name => $id) {
 	echo "<option value=$name>$name</option>";
@@ -83,8 +85,7 @@ echo "<input type=submit value=\"Perform DNS Query\"><br>";
 if (isset($_REQUEST['doquery']))
 {
 echo "<pre>";
-$query=new DNSQuery($server,$port,$timeout,$udp,$debug);
-if ($binarydebug) $query->binarydebug=true;
+$query=new DNSQuery($server,$port,$timeout,$udp,$debug,$binarydebug);
 
 if ($type=="SMARTA")
 	{
@@ -104,7 +105,7 @@ if ($query->error)
 	echo "\nQuery Error: ".$query->lasterror."\n\n";
 	exit();
 	}
-echo "Returned ".$result->count." Answers\n\n";
+echo "Returned ".$result->getCount()." Answers\n\n";
 
 function ShowSection($result)
 {
@@ -145,4 +146,3 @@ if ($extendanswer)
 
 echo "</pre>";
 }
-?>

@@ -19,7 +19,9 @@ along with this software.  If not, see www.gnu.org/licenses
 
 For more information see www.purplepixie.org/phpdns
 -------------------------------------------------------------- */
-require("dns.inc.php");
+use PurplePixie\PhpDns\DNSQuery;
+
+require 'vendor/autoload.php';
 
 $server="127.0.0.1";
 $port=53;
@@ -61,15 +63,15 @@ if ($query->error)
 	echo "Query Error: ".$query->lasterror."\n";
 	exit();
 	}
-echo "Returned ".$result->count." Answers\n";
-for ($i=0; $i<$result->count; $i++)
+echo "Returned ".$result->getCount()." Answers\n";
+for ($i=0; $i<$result->getCount(); $i++)
 	{
-	echo $i.". ".$result->results[$i]->typeid."(".$result->results[$i]->type.") => ".$result->results[$i]->data." [";
-	echo $result->results[$i]->string;
+	echo $i.". ".$result->getResult($i)->typeid."(".$result->getResult($i)->type.") => ".$result->getResult($i)->data." [";
+	echo $result->getResult($i)->string;
 	echo "]\n";
-	if (count($result->results[$i]->extras)>0) // additional data
+	if (count($result->getResult($i)->extras)>0) // additional data
 		{
-		foreach($result->results[$i]->extras as $key => $val)
+		foreach($result->getResult($i)->extras as $key => $val)
 			{
 			if ($key != 'ipbin') // We don't want to echo binary data
 				{
@@ -78,4 +80,3 @@ for ($i=0; $i<$result->count; $i++)
 			}
 		}
 	}
-?>
