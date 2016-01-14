@@ -6,20 +6,20 @@ DNS API / Library for PHP - www.purplepixie.org/phpdns/
 Changelog
 ---------
 
-
-Version 1.05		30th December 2014
+```
+Version 1.05 30th December 2014
 David Cutting -- dcutting (some_sort_of_at_sign) purplepixie dot org
 
 D Tucny - 2011-06-21 - Add lots more types with RFC references
 D Tucny - 2011-06-21 - Add decoding of IPv6 addresses in AAAA RRs and sorted handling alphabetically
 D Tucny - 2011-06-21 - Switch to using inet_ntop function where available to decode IP addresses
-			and include binary IP in extras
+                       and include binary IP in extras
 D Tucny - 2011-06-21 - Add fallback inet_ntop function (sourced from php.net) for
-			platforms missing it
+                       platforms missing it
 D Tucny - 2011-06-21 - Correct string extraction for TXT records 
-			(a TXT record can contain one of more 255 character strings 
-			with an initial length byte that are concatenated togeter) 
-			the length bytes were being included in the result as part of the text
+                       (a TXT record can contain one of more 255 character strings 
+                       with an initial length byte that are concatenated togeter) 
+                       the length bytes were being included in the result as part of the text
 D Tucny - 2011-06-21 - Add decoding of SPF as an alias of TXT due to identical formatting
 D Tucny - 2011-06-21 - Make binarydebug a parameter of DNSQuery in addition to plain debug
 D Tucny - 2011-06-21 - Add header flag parsing
@@ -38,4 +38,5 @@ D Cutting - 2014-12-30 - Added stream timeout function (thanks to Jorgen Thomsen
                          Also corrected some indentation, added comment and updated copyright
 D Cutting - 2014-12-30 - Corrected error typo (thanks to Jorgen Thomsen) [1.05]
 
-Bert-Jan de Lange - 2016-01-13 - Convert to PSR-0
+Bert-Jan de Lange - 2016-01-13 - Convert to PHP5, PSR-0, composer|2.0-dev
+```
