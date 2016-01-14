@@ -32,51 +32,54 @@ $binarydebug=false;
 $type="A";
 $question="www.purplepixie.org";
 
-
-if ($argc>1)
-	{
-	for ($i=1; $i<$argc; $i++)
-		{
+if ($argc>1) {
+	for ($i=1; $i<$argc; $i++) {
 		$arg=$argv[$i];
-		if ($arg[0]=="@") $server=substr($arg,1);
-		else if (($arg=="-t")||($arg=="--t"))
-			{
-			$i++;
-			$type=strtoupper($argv[$i]);
-			}
-		else if (($arg=="--tcp")||($arg=="-tcp")) $udp=false;
-		else if (($arg=="--udp")||($arg=="-udp")) $udp=true;
-		else if (($arg=="--debug")||($arg=="-d")) $debug=true;
-		else if ($arg=="-dd") $debug=$binarydebug=true;
-		else $question=$arg;
-		}
-	}
+
+        if ($arg[0] == "@") {
+            $server = substr($arg, 1);
+        } elseif (($arg == "-t") || ($arg == "--t")) {
+            $i++;
+            $type = strtoupper($argv[$i]);
+        } elseif (($arg == "--tcp") || ($arg == "-tcp")) {
+            $udp = false;
+        } elseif (($arg == "--udp") || ($arg == "-udp")) {
+            $udp = true;
+        } elseif (($arg == "--debug") || ($arg == "-d")) {
+            $debug = true;
+        } elseif ($arg == "-dd") {
+            $debug = $binarydebug = true;
+        } else {
+            $question = $arg;
+        }
+    }
+}
 
 $query=new DNSQuery($server,$port,$timeout,$udp,$debug,$binarydebug);
 
 echo "Querying: ".$question." -t ".$type." @".$server."\n";
 
-$result=$query->Query($question,$type);
+$result=$query->query($question,$type);
 
-if ($query->error)
-	{
-	echo "Query Error: ".$query->lasterror."\n";
-	exit();
-	}
-echo "Returned ".$result->getCount()." Answers\n";
-for ($i=0; $i<$result->getCount(); $i++)
-	{
-	echo $i.". ".$result->getResult($i)->typeid."(".$result->getResult($i)->type.") => ".$result->getResult($i)->data." [";
-	echo $result->getResult($i)->string;
-	echo "]\n";
-	if (count($result->getResult($i)->extras)>0) // additional data
-		{
-		foreach($result->getResult($i)->extras as $key => $val)
-			{
-			if ($key != 'ipbin') // We don't want to echo binary data
-				{
-				echo " - ".$key." = ".$val."\n";
-				}
-			}
-		}
-	}
+if ($query->hasError()) {
+    echo "Query Error: " . $query->getLasterror() . "\n";
+    exit();
+}
+
+echo "Returned ".count($result)." Answers\n";
+
+foreach ($result as $index => $record) {
+    echo $index . ". " . $record->getTypeid() . "(" . $record->getType() . ") => " . $record->getData() . " [";
+    echo $record->getString();
+    echo "]\n";
+
+    // additional data
+    if (count($record->getExtras()) > 0) {
+        foreach ($record->getExtras() as $key => $val) {
+            // We don't want to echo binary data
+            if ($key != 'ipbin') {
+                echo " - " . $key . " = " . $val . "\n";
+            }
+        }
+    }
+}

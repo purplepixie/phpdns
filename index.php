@@ -19,30 +19,22 @@ along with this software.  If not, see www.gnu.org/licenses
 
 For more information see www.purplepixie.org/phpdns
 -------------------------------------------------------------- */
+use PurplePixie\PhpDns\DNSAnswer;
 use PurplePixie\PhpDns\DNSQuery;
 use PurplePixie\PhpDns\DNSTypes;
 
 require 'vendor/autoload.php';
 
 // ** IGNORE THIS - It's just the web form ** //
-if (isset($_REQUEST['server'])) $server=$_REQUEST['server'];
-else $server="127.0.0.1";
-if (isset($_REQUEST['port'])) $port=$_REQUEST['port'];
-else $port=53;
-if (isset($_REQUEST['timeout'])) $timeout=$_REQUEST['timeout'];
-else $timeout=60;
-if (isset($_REQUEST['tcp'])) $udp=false;
-else $udp=true;
-if (isset($_REQUEST['debug'])) $debug=true;
-else $debug=false;
-if (isset($_REQUEST['binarydebug'])) $binarydebug=true;
-else $binarydebug=false;
-if (isset($_REQUEST['extendanswer'])) $extendanswer=true;
-else $extendanswer=false;
-if (isset($_REQUEST['type'])) $type=$_REQUEST['type'];
-else $type="A";
-if (isset($_REQUEST['question'])) $question=$_REQUEST['question'];
-else $question="www.purplepixie.org";
+$server = isset($_REQUEST['server']) ? $_REQUEST['server'] : "127.0.0.1";
+$port = isset($_REQUEST['port']) ? $_REQUEST['port'] : 53;
+$timeout = isset($_REQUEST['timeout']) ? $_REQUEST['timeout'] : 60;
+$udp = isset($_REQUEST['tcp']) ? false : true;
+$debug = isset($_REQUEST['debug']) ? true : false;
+$binarydebug = isset($_REQUEST['binarydebug']) ? true : false;
+$extendanswer = isset($_REQUEST['extendanswer']) ? true : false;
+$type = isset($_REQUEST['type']) ? $_REQUEST['type'] : "A";
+$question = isset($_REQUEST['question']) ? $_REQUEST['question'] : "www.purplepixie.org";
 
 echo "<html><title>DNS Web Example</title><body>";
 echo "<form action=./ method=get>";
@@ -51,10 +43,9 @@ echo "Query <input type=text name=question size=50 value=\"".$question."\"> ";
 echo "<select name=type>";
 echo "<option value=".$type.">".$type."</option>";
 $types=new DNSTypes();
-$types2=$types->getAllTypesByName();
-ksort($types2);
-foreach ($types2 as $name => $id) {
-	echo "<option value=$name>$name</option>";
+$types2=$types->getAllTypeNamesSorted();
+foreach ($types2 as $name) {
+	echo "<option value=\"$name\">$name</option>";
 }
 echo "<option value=SMARTA>SmartA</option>"; 
 echo "</select><br>";
@@ -82,67 +73,71 @@ echo "<input type=submit value=\"Perform DNS Query\"><br>";
 
 // ** HERE IS THE QUERY SECTION ** //
 
-if (isset($_REQUEST['doquery']))
-{
-echo "<pre>";
-$query=new DNSQuery($server,$port,$timeout,$udp,$debug,$binarydebug);
+if (isset($_REQUEST['doquery'])) {
+    echo "<pre>";
 
-if ($type=="SMARTA")
-	{
-	echo "Smart A Lookup for ".$question."\n\n";
-	$hostname=$query->SmartALookup($question);
-	echo "Result: ".$hostname."\n\n";
-	echo "</pre>";
-	exit();
-	}
+    $query=new DNSQuery($server,$port,$timeout,$udp,$debug,$binarydebug);
 
-echo "Querying: ".$question." -t ".$type." @".$server."\n";
+    if ($type=="SMARTA") {
+        echo "Smart A Lookup for ".$question."\n\n";
+        $hostname=$query->smartALookup($question);
+        echo "Result: ".$hostname."\n\n";
+        echo "</pre>";
+        exit();
+    }
 
-$result=$query->Query($question,$type);
+    echo "Querying: ".$question." -t ".$type." @".$server."\n";
 
-if ($query->error)
-	{
-	echo "\nQuery Error: ".$query->lasterror."\n\n";
-	exit();
-	}
-echo "Returned ".$result->getCount()." Answers\n\n";
+    $result=$query->query($question,$type);
 
-function ShowSection($result)
-{
-global $extendanswer;
-for ($i=0; $i<$result->count; $i++)
-	{
-	echo $i.". ";
-	if ($result->results[$i]->string=="") 
-		echo $result->results[$i]->typeid."(".$result->results[$i]->type.") => ".$result->results[$i]->data;
-	else echo $result->results[$i]->string;
-	echo "\n";
-	if ($extendanswer) 
-		{
-		echo " - record type = ".$result->results[$i]->typeid." (# ".$result->results[$i]->type.")\n";
-		echo " - record data = ".$result->results[$i]->data."\n";
-		echo " - record ttl = ".$result->results[$i]->ttl."\n";
-		if (count($result->results[$i]->extras)>0) // additional data
-			{
-			foreach($result->results[$i]->extras as $key => $val)
-				{
-				echo " + ".$key." = ".$val."\n";
-				}
-			}
-		}
-	echo "\n";
-	}
+    if ($query->hasError()) {
+        echo "\nQuery Error: ".$query->getLasterror()."\n\n";
+        exit();
+    }
+
+    echo "Returned ".count($result)." Answers\n\n";
+
+    ShowSection($result);
+
+    if ($extendanswer) {
+        echo "\nNameserver Records: ".count($query->getLastnameservers())."\n";
+        ShowSection($query->getLastnameservers());
+
+        echo "\nAdditional Records: ".count($query->getLastadditional())."\n";
+        ShowSection($query->getLastadditional());
+    }
+
+    echo "</pre>";
 }
-ShowSection($result);
 
-if ($extendanswer)
-	{
-	echo "\nNameserver Records: ".$query->lastnameservers->count."\n";
-	ShowSection($query->lastnameservers);
-	
-	echo "\nAdditional Records: ".$query->lastadditional->count."\n";
-	ShowSection($query->lastadditional);
-	}
+function ShowSection(DNSAnswer $result)
+{
+    global $extendanswer;
 
-echo "</pre>";
+    foreach ($result as $index => $record) {
+        echo $index.". ";
+
+        if ($record->getString()=="") {
+            echo $record->getTypeid() . "(" . $record->getType() . ") => " . $record->getData();
+        } else {
+            echo $record->getString();
+        }
+
+        echo "\n";
+
+        if ($extendanswer) {
+            echo " - record type = ".$record->getTypeid()." (# ".$record->getType().")\n";
+            echo " - record data = ".$record->getData()."\n";
+            echo " - record ttl = ".$record->getTtl()."\n";
+
+            // additional data
+            if (count($record->getExtras()) > 0) {
+                foreach($record->getExtras() as $key => $val) {
+                    echo " + ".$key." = ".$val."\n";
+                }
+            }
+        }
+
+        echo "\n";
+    }
 }

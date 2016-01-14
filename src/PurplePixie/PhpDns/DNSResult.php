@@ -24,12 +24,129 @@ namespace PurplePixie\PhpDns;
  */
 class DNSResult
 {
-    public $type;
-    public $typeid;
-    public $class;
-    public $ttl;
-    public $data;
-    public $domain;
-    public $string;
-    public $extras = array();
+    /**
+     * @var string
+     */
+    private $type;
+
+    /**
+     * @var int
+     */
+    private $typeid;
+
+    /**
+     * @var string
+     */
+    private $class;
+
+    /**
+     * @var int
+     */
+    private $ttl;
+
+    /**
+     * @var string
+     */
+    private $data;
+
+    /**
+     * @var string
+     */
+    private $domain;
+
+    /**
+     * @var string
+     */
+    private $string;
+
+    /**
+     * @var array string
+     */
+    private $extras = array();
+
+    /**
+     * @param string $type
+     * @param int $typeid
+     * @param string $class
+     * @param int $ttl
+     * @param string $data
+     * @param string $domain
+     * @param string $string
+     * @param array $extras
+     */
+    public function __construct($type, $typeid, $class, $ttl, $data, $domain, $string, array $extras)
+    {
+        $this->type = $type;
+        $this->typeid = $typeid;
+        $this->class = $class;
+        $this->ttl = $ttl;
+        $this->data = $data;
+        $this->domain = $domain;
+        $this->string = $string;
+        $this->extras = $extras;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTypeid()
+    {
+        return $this->typeid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClass()
+    {
+        return $this->class;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTtl()
+    {
+        return $this->ttl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomain()
+    {
+        return $this->domain;
+    }
+
+    /**
+     * @return string
+     */
+    public function getString()
+    {
+        return $this->string;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExtras()
+    {
+        return $this->extras;
+    }
 }

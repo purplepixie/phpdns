@@ -24,139 +24,85 @@ namespace PurplePixie\PhpDns;
  */
 class DNSQuery
 {
-    protected $server = "";
-    protected $port;
-    protected $timeout; // default set in constructor
-    protected $udp;
-    protected $debug;
-    protected $binarydebug = false;
+    /**
+     * @var string
+     */
+    private $server = "";
+
+    /**
+     * @var int
+     */
+    private $port;
+
+    /**
+     * @var int
+     */
+    private $timeout; // default set in constructor
+
+    /**
+     * @var bool
+     */
+    private $udp;
+
+    /**
+     * @var bool
+     */
+    private $debug;
+
+    /**
+     * @var bool
+     */
+    private $binarydebug = false;
 
     /**
      * @var DNSTypes
      */
-    protected $types;
-
-    var $rawbuffer = "";
-    var $rawheader = "";
-    var $rawresponse = "";
-    var $header;
-    var $responsecounter = 0;
-
-    var $lastnameservers;
-    var $lastadditional;
-
-    var $error = false;
-    var $lasterror = "";
+    private $types;
 
     /**
-     * @param int $count
-     * @param string $offset
-     * @return string
+     * @var string
      */
-    function ReadResponse($count = 1, $offset = "")
-    {
-        if ($offset == "") // no offset so use and increment the ongoing counter
-        {
-            $return = substr($this->rawbuffer, $this->responsecounter, $count);
-            $this->responsecounter += $count;
-        } else {
-            $return = substr($this->rawbuffer, $offset, $count);
-        }
-        return $return;
-    }
+    private $rawbuffer = "";
 
     /**
-     * @param int $offset
-     * @param int $counter
-     * @return array
+     * @var string
      */
-    function ReadDomainLabels($offset, &$counter = 0)
-    {
-        $labels = array();
-        $startoffset = $offset;
-        $return = false;
-        while (!$return) {
-            $label_len = ord($this->ReadResponse(1, $offset++));
-            if ($label_len <= 0) {
-                $return = true;
-            } // end of data
-            else {
-                if ($label_len < 64) // uncompressed data
-                {
-                    $labels[] = $this->ReadResponse($label_len, $offset);
-                    $offset += $label_len;
-                } else // label_len>=64 -- pointer
-                {
-                    $nextitem = $this->ReadResponse(1, $offset++);
-                    $pointer_offset = (($label_len & 0x3f) << 8) + ord($nextitem);
-                    // Branch Back Upon Ourselves...
-                    $this->Debug("Label Offset: " . $pointer_offset);
-                    $pointer_labels = $this->ReadDomainLabels($pointer_offset);
-                    foreach ($pointer_labels as $ptr_label) {
-                        $labels[] = $ptr_label;
-                    }
-                    $return = true;
-                }
-            }
-        }
-        $counter = $offset - $startoffset;
-        return $labels;
-    }
+    private $rawheader = "";
 
     /**
-     * @return string
+     * @var string
      */
-    function ReadDomainLabel()
-    {
-        $count = 0;
-        $labels = $this->ReadDomainLabels($this->responsecounter, $count);
-        $domain = implode(".", $labels);
-        $this->responsecounter += $count;
-        $this->Debug("Label " . $domain . " len " . $count);
-        return $domain;
-    }
+    private $rawresponse = "";
 
-    function Debug($text)
-    {
-        if ($this->debug) {
-            echo $text . "\n";
-        }
-    }
+    /**
+     * @var array
+     */
+    private $header;
 
-    function DebugBinary($data)
-    {
-        if ($this->binarydebug) {
-            for ($a = 0; $a < strlen($data); $a++) {
-                echo $a;
-                echo "\t";
-                printf("%d", $data[$a]);
-                echo "\t";
-                $hex = bin2hex($data[$a]);
-                echo "0x" . $hex;
-                echo "\t";
-                $dec = hexdec($hex);
-                echo $dec;
-                echo "\t";
-                if (($dec > 30) && ($dec < 150)) {
-                    echo $data[$a];
-                }
-                echo "\n";
-            }
-        }
-    }
+    /**
+     * @var int
+     */
+    private $responsecounter = 0;
 
-    function SetError($text)
-    {
-        $this->error = true;
-        $this->lasterror = $text;
-        $this->Debug("Error: " . $text);
-    }
+    /**
+     * @var DNSAnswer
+     */
+    private $lastnameservers;
 
-    function ClearError()
-    {
-        $this->error = false;
-        $this->lasterror = "";
-    }
+    /**
+     * @var DNSAnswer
+     */
+    private $lastadditional;
+
+    /**
+     * @var bool
+     */
+    private $error = false;
+
+    /**
+     * @var string
+     */
+    private $lasterror = "";
 
     /**
      * @param string $server
@@ -176,30 +122,152 @@ class DNSQuery
         $this->binarydebug = $binarydebug;
 
         $this->types = new DNSTypes();
-        $this->Debug("DNSQuery Class Initialised");
+        $this->debug("DNSQuery Class Initialised");
+    }
+
+    /**
+     * @param int $count
+     * @param string $offset
+     * @return string
+     */
+    private function readResponse($count = 1, $offset = "")
+    {
+        if ($offset == "") {
+            // no offset so use and increment the ongoing counter
+            $return = substr($this->rawbuffer, $this->responsecounter, $count);
+            $this->responsecounter += $count;
+        } else {
+            $return = substr($this->rawbuffer, $offset, $count);
+        }
+
+        return $return;
+    }
+
+    /**
+     * @param int $offset
+     * @param int $counter
+     * @return array
+     */
+    private function readDomainLabels($offset, &$counter = 0)
+    {
+        $labels = array();
+        $startoffset = $offset;
+        $return = false;
+        while (!$return) {
+            $label_len = ord($this->readResponse(1, $offset++));
+            if ($label_len <= 0) {
+                $return = true;
+            } // end of data
+            else {
+                if ($label_len < 64) // uncompressed data
+                {
+                    $labels[] = $this->readResponse($label_len, $offset);
+                    $offset += $label_len;
+                } else // label_len>=64 -- pointer
+                {
+                    $nextitem = $this->readResponse(1, $offset++);
+                    $pointer_offset = (($label_len & 0x3f) << 8) + ord($nextitem);
+                    // Branch Back Upon Ourselves...
+                    $this->debug("Label Offset: " . $pointer_offset);
+                    $pointer_labels = $this->readDomainLabels($pointer_offset);
+                    foreach ($pointer_labels as $ptr_label) {
+                        $labels[] = $ptr_label;
+                    }
+                    $return = true;
+                }
+            }
+        }
+        $counter = $offset - $startoffset;
+        return $labels;
+    }
+
+    /**
+     * @return string
+     */
+    private function readDomainLabel()
+    {
+        $count = 0;
+        $labels = $this->readDomainLabels($this->responsecounter, $count);
+        $domain = implode(".", $labels);
+        $this->responsecounter += $count;
+        $this->debug("Label " . $domain . " len " . $count);
+        return $domain;
+    }
+
+    /**
+     * @param string $text
+     */
+    private function debug($text)
+    {
+        if ($this->debug) {
+            echo $text . "\n";
+        }
+    }
+
+    /**
+     * @param string $data
+     */
+    function debugBinary($data)
+    {
+        if (!$this->binarydebug) {
+            return;
+        }
+
+        for ($a = 0; $a < strlen($data); $a++) {
+            echo $a;
+            echo "\t";
+            printf("%d", $data[$a]);
+            echo "\t";
+            $hex = bin2hex($data[$a]);
+            echo "0x" . $hex;
+            echo "\t";
+            $dec = hexdec($hex);
+            echo $dec;
+            echo "\t";
+            if (($dec > 30) && ($dec < 150)) {
+                echo $data[$a];
+            }
+            echo "\n";
+        }
+    }
+
+    /**
+     * @param string $text
+     */
+    private function setError($text)
+    {
+        $this->error = true;
+        $this->lasterror = $text;
+        $this->debug("Error: " . $text);
+    }
+
+    private function clearError()
+    {
+        $this->error = false;
+        $this->lasterror = "";
     }
 
     /**
      * @return array
      */
-    function ReadRecord()
+    private function readRecord()
     {
         // First the pesky domain names - maybe not so pesky though I suppose
 
-        $domain = $this->ReadDomainLabel();
+        $domain = $this->readDomainLabel();
 
-        $ans_header_bin = $this->ReadResponse(10); // 10 byte header
+        $ans_header_bin = $this->readResponse(10); // 10 byte header
         $ans_header = unpack("ntype/nclass/Nttl/nlength", $ans_header_bin);
-        $this->Debug("Record Type " . $ans_header['type'] . " Class " . $ans_header['class'] . " TTL " . $ans_header['ttl'] . " Length " . $ans_header['length']);
+        $this->debug("Record Type " . $ans_header['type'] . " Class " . $ans_header['class'] . " TTL " . $ans_header['ttl'] . " Length " . $ans_header['length']);
 
-        $typeid = $this->types->GetById($ans_header['type']);
+        $typeid = $this->types->getById($ans_header['type']);
         $extras = array();
         $data = "";
         $string = "";
 
         switch ($typeid) {
             case "A":
-                $ipbin = $this->ReadResponse(4);
+                $ipbin = $this->readResponse(4);
                 $ip = inet_ntop($ipbin);
                 $data = $ip;
                 $extras['ipbin'] = $ipbin;
@@ -207,7 +275,7 @@ class DNSQuery
                 break;
 
             case "AAAA":
-                $ipbin = $this->ReadResponse(16);
+                $ipbin = $this->readResponse(16);
                 $ip = inet_ntop($ipbin);
                 $data = $ip;
                 $extras['ipbin'] = $ipbin;
@@ -215,18 +283,18 @@ class DNSQuery
                 break;
 
             case "CNAME":
-                $data = $this->ReadDomainLabel();
+                $data = $this->readDomainLabel();
                 $string = $domain . " alias of " . $data;
                 break;
 
             case "DNAME":
-                $data = $this->ReadDomainLabel();
+                $data = $this->readDomainLabel();
                 $string = $domain . " alias of " . $data;
                 break;
 
             case "DNSKEY":
             case "KEY":
-                $stuff = $this->ReadResponse(4);
+                $stuff = $this->readResponse(4);
 
                 // key type test 21/02/2014 DC
                 $test = unpack("nflags/cprotocol/calgo", $stuff);
@@ -234,35 +302,35 @@ class DNSQuery
                 $extras['protocol'] = $test['protocol'];
                 $extras['algorithm'] = $test['algo'];
 
-                $data = base64_encode($this->ReadResponse($ans_header['length'] - 4));
+                $data = base64_encode($this->readResponse($ans_header['length'] - 4));
                 $string = $domain . " KEY " . $data;
                 break;
 
             case "MX":
-                $prefs = $this->ReadResponse(2);
+                $prefs = $this->readResponse(2);
                 $prefs = unpack("nlevel", $prefs);
                 $extras['level'] = $prefs['level'];
-                $data = $this->ReadDomainLabel();
+                $data = $this->readDomainLabel();
                 $string = $domain . " mailserver " . $data . " (pri=" . $extras['level'] . ")";
                 break;
 
             case "NS":
-                $nameserver = $this->ReadDomainLabel();
+                $nameserver = $this->readDomainLabel();
                 $data = $nameserver;
                 $string = $domain . " nameserver " . $nameserver;
                 break;
 
             case "PTR":
-                $data = $this->ReadDomainLabel();
+                $data = $this->readDomainLabel();
                 $string = $domain . " points to " . $data;
                 break;
 
             case "SOA":
                 // Label First
-                $data = $this->ReadDomainLabel();
-                $responsible = $this->ReadDomainLabel();
+                $data = $this->readDomainLabel();
+                $responsible = $this->readDomainLabel();
 
-                $buffer = $this->ReadResponse(20);
+                $buffer = $this->readResponse(20);
                 $extras = unpack("Nserial/Nrefresh/Nretry/Nexpiry/Nminttl", $buffer); // butfix to NNNNN from nnNNN for 1.01
                 $dot = strpos($responsible, ".");
                 $responsible[$dot] = "@";
@@ -271,12 +339,12 @@ class DNSQuery
                 break;
 
             case "SRV":
-                $prefs = $this->ReadResponse(6);
+                $prefs = $this->readResponse(6);
                 $prefs = unpack("npriority/nweight/nport", $prefs);
                 $extras['priority'] = $prefs['priority'];
                 $extras['weight'] = $prefs['weight'];
                 $extras['port'] = $prefs['port'];
-                $data = $this->ReadDomainLabel();
+                $data = $this->readDomainLabel();
                 $string = $domain . " SRV " . $data . ":" . $extras['port'] . " (pri=" . $extras['priority'] . ", weight=" . $extras['weight'] . ")";
                 break;
 
@@ -284,28 +352,27 @@ class DNSQuery
             case "SPF":
                 $data = "";
                 for ($string_count = 0; strlen($data) + (1 + $string_count) < $ans_header['length']; $string_count++) {
-                    $string_length = ord($this->ReadResponse(1));
-                    $data .= $this->ReadResponse($string_length);
+                    $string_length = ord($this->readResponse(1));
+                    $data .= $this->readResponse($string_length);
                 }
 
                 $string = $domain . " TEXT \"" . $data . "\" (in " . $string_count . " strings)";
                 break;
 
             default: // something we can't deal with
-                $stuff = $this->ReadResponse($ans_header['length']);
+                $stuff = $this->readResponse($ans_header['length']);
                 break;
 
         }
 
-        //$dns_answer->AddResult($ans_header['type'],$typeid,$ans_header['class'],$ans_header['ttl'],$data,$domain,$string,$extras);
-        $return = array(
+        return array(
             "header" => $ans_header,
             "typeid" => $typeid,
             "data" => $data,
             "domain" => $domain,
             "string" => $string,
-            "extras" => $extras);
-        return $return;
+            "extras" => $extras
+        );
     }
 
     /**
@@ -313,12 +380,13 @@ class DNSQuery
      * @param string $type
      * @return DNSAnswer|false
      */
-    function Query($question, $type = "A")
+    public function query($question, $type = "A")
     {
-        $this->ClearError();
-        $typeid = $this->types->GetByName($type);
+        $this->clearError();
+        $typeid = $this->types->getByName($type);
+
         if ($typeid === false) {
-            $this->SetError("Invalid Query Type " . $type);
+            $this->setError("Invalid Query Type " . $type);
             return false;
         }
 
@@ -330,8 +398,9 @@ class DNSQuery
 
         $errno = 0;
         $errstr = "";
+
         if (!$socket = fsockopen($host, $this->port, $errno, $errstr, $this->timeout)) {
-            $this->SetError("Failed to Open Socket");
+            $this->setError("Failed to Open Socket");
             return false;
         }
 
@@ -357,6 +426,7 @@ class DNSQuery
         }
 
         $question_binary = "";
+
         for ($a = 0; $a < count($labels); $a++) {
             if ($labels[$a] != "") {
                 $size = strlen($labels[$a]);
@@ -368,9 +438,10 @@ class DNSQuery
                 //$question_binary.=pack("C",$labels[$a]);
             }
         }
+
         $question_binary .= pack("C", 0); // end it off
 
-        $this->Debug("Question: " . $question . " (type=" . $type . "/" . $typeid . ")");
+        $this->debug("Question: " . $question . " (type=" . $type . "/" . $typeid . ")");
 
         $id = rand(1, 255) | (rand(0, 255) << 8);    // generate the ID
 
@@ -389,11 +460,11 @@ class DNSQuery
         $headersize = strlen($header);
         $headersizebin = pack("n", $headersize);
 
-        $this->Debug("Header Length: " . $headersize . " Bytes");
-        $this->DebugBinary($header);
+        $this->debug("Header Length: " . $headersize . " Bytes");
+        $this->debugBinary($header);
 
         if (($this->udp) && ($headersize >= 512)) {
-            $this->SetError("Question too big for UDP (" . $headersize . " bytes)");
+            $this->setError("Question too big for UDP (" . $headersize . " bytes)");
             fclose($socket);
             return false;
         }
@@ -401,50 +472,55 @@ class DNSQuery
         if ($this->udp) // UDP method
         {
             if (!fwrite($socket, $header, $headersize)) {
-                $this->SetError("Failed to write question to socket");
+                $this->setError("Failed to write question to socket");
                 fclose($socket);
                 return false;
             }
             if (!$this->rawbuffer = fread($socket, 4096)) // read until the end with UDP
             {
-                $this->SetError("Failed to read data buffer");
+                $this->setError("Failed to read data buffer");
                 fclose($socket);
                 return false;
             }
         } else // TCP
         {
-            if (!fwrite($socket, $headersizebin)) // write the socket
-            {
-                $this->SetError("Failed to write question length to TCP socket");
+            // write the socket
+            if (!fwrite($socket, $headersizebin)) {
+                $this->setError("Failed to write question length to TCP socket");
                 fclose($socket);
                 return false;
             }
+
             if (!fwrite($socket, $header, $headersize)) {
-                $this->SetError("Failed to write question to TCP socket");
+                $this->setError("Failed to write question to TCP socket");
                 fclose($socket);
                 return false;
             }
+
             if (!$returnsize = fread($socket, 2)) {
-                $this->SetError("Failed to read size from TCP socket");
+                $this->setError("Failed to read size from TCP socket");
                 fclose($socket);
                 return false;
             }
+
             $tmplen = unpack("nlength", $returnsize);
             $datasize = $tmplen['length'];
-            $this->Debug("TCP Stream Length Limit " . $datasize);
+            $this->debug("TCP Stream Length Limit " . $datasize);
+
             if (!$this->rawbuffer = fread($socket, $datasize)) {
-                $this->SetError("Failed to read data buffer");
+                $this->setError("Failed to read data buffer");
                 fclose($socket);
                 return false;
             }
         }
+
         fclose($socket);
 
         $buffersize = strlen($this->rawbuffer);
-        $this->Debug("Read Buffer Size " . $buffersize);
+        $this->debug("Read Buffer Size " . $buffersize);
 
         if ($buffersize < 12) {
-            $this->SetError("Return Buffer too Small");
+            $this->setError("Return Buffer too Small");
             return false;
         }
 
@@ -453,7 +529,7 @@ class DNSQuery
 
         $this->responsecounter = 12; // start parsing response counter from 12 - no longer using response so can do pointers
 
-        $this->DebugBinary($this->rawbuffer);
+        $this->debugBinary($this->rawbuffer);
 
         $this->header = unpack("nid/nspec/nqdcount/nancount/nnscount/narcount", $this->rawheader);
 
@@ -468,52 +544,68 @@ class DNSQuery
         $opcode = ($this->header['spec'] >> 11) & 15;
         $type = ($this->header['spec'] >> 15) & 1;
 
-        $this->Debug("ID=$id, Type=$type, OPCODE=$opcode, AA=$aa, TC=$tc, RD=$rd, RA=$ra, RCODE=$rcode");
+        $this->debug("ID=$id, Type=$type, OPCODE=$opcode, AA=$aa, TC=$tc, RD=$rd, RA=$ra, RCODE=$rcode");
 
         if ($tc == 1 && $this->udp) { // Truncation detected
-            $this->SetError("Response too big for UDP, retry with TCP");
+            $this->setError("Response too big for UDP, retry with TCP");
             return false;
         }
 
         $answers = $this->header['ancount'];
 
-        $this->Debug("Query Returned " . $answers . " Answers");
+        $this->debug("Query Returned " . $answers . " Answers");
 
         $dns_answer = new DNSAnswer();
 
         // Deal with the header question data
         if ($this->header['qdcount'] > 0) {
-            $this->Debug("Found " . $this->header['qdcount'] . " Questions");
+            $this->debug("Found " . $this->header['qdcount'] . " Questions");
             for ($a = 0; $a < $this->header['qdcount']; $a++) {
                 $c = 1;
                 while ($c != 0) {
-                    $c = hexdec(bin2hex($this->ReadResponse(1)));
+                    $c = hexdec(bin2hex($this->readResponse(1)));
                 }
-                $extradata = $this->ReadResponse(4);
+                $extradata = $this->readResponse(4);
             }
         }
 
         // New Functional Method
         for ($a = 0; $a < $this->header['ancount']; $a++) {
-            $record = $this->ReadRecord();
-            $dns_answer->AddResult($record['header']['type'], $record['typeid'], $record['header']['class'], $record['header']['ttl'],
-                $record['data'], $record['domain'], $record['string'], $record['extras']);
+            $record = $this->readRecord();
+
+            $dns_answer->addResult(
+                new DNSResult(
+                    $record['header']['type'], $record['typeid'], $record['header']['class'], $record['header']['ttl'],
+                    $record['data'], $record['domain'], $record['string'], $record['extras']
+                )
+            );
         }
 
         $this->lastnameservers = new DNSAnswer();
+
         for ($a = 0; $a < $this->header['nscount']; $a++) {
-            $record = $this->ReadRecord();
-            $this->lastnameservers->AddResult($record['header']['type'], $record['typeid'], $record['header']['class'], $record['header']['ttl'],
-                $record['data'], $record['domain'], $record['string'], $record['extras']);
+            $record = $this->readRecord();
+
+            $this->lastnameservers->addResult(
+                new DNSResult(
+                    $record['header']['type'], $record['typeid'], $record['header']['class'], $record['header']['ttl'],
+                    $record['data'], $record['domain'], $record['string'], $record['extras']
+                )
+            );
         }
 
         $this->lastadditional = new DNSAnswer();
-        for ($a = 0; $a < $this->header['arcount']; $a++) {
-            $record = $this->ReadRecord();
-            $this->lastadditional->AddResult($record['header']['type'], $record['typeid'], $record['header']['class'], $record['header']['ttl'],
-                $record['data'], $record['domain'], $record['string'], $record['extras']);
-        }
 
+        for ($a = 0; $a < $this->header['arcount']; $a++) {
+            $record = $this->readRecord();
+
+            $this->lastadditional->addResult(
+                new DNSResult(
+                    $record['header']['type'], $record['typeid'], $record['header']['class'], $record['header']['ttl'],
+                    $record['data'], $record['domain'], $record['string'], $record['extras']
+                )
+            );
+        }
 
         return $dns_answer;
     }
@@ -521,73 +613,101 @@ class DNSQuery
     /**
      * @param string $hostname
      * @param int $depth
+     *
      * @return string
      */
-    function SmartALookup($hostname, $depth = 0)
+    public function smartALookup($hostname, $depth = 0)
     {
-        $this->Debug("SmartALookup for " . $hostname . " depth " . $depth);
+        $this->debug("SmartALookup for " . $hostname . " depth " . $depth);
+
+        // avoid recursive lookups
         if ($depth > 5) {
             return "";
-        } // avoid recursive lookups
-        // The SmartALookup function will resolve CNAMES using the additional properties if possible
-        $answer = $this->Query($hostname, "A");
+        }
 
+        // The SmartALookup function will resolve CNAMES using the additional properties if possible
+        $answer = $this->query($hostname, "A");
+
+        // failed totally
         if ($answer === false) {
             return "";
-        }        // failed totally
-        if ($answer->getCount() <= 0) {
+        }
+
+        // no records at all returned
+        if (count($answer) === 0) {
             return "";
-        }    // no records at all returned
+        }
 
-        $best_answer = "";
-        $best_answer_typeid = 0;
-
-        $records = $answer->getCount();
-        for ($a = 0; $a < $records; $a++) {
-            $data = $answer->getResult($a)->data;
-            $answer_typeid = $answer->getResult($a)->typeid;
-
-            if ($answer_typeid == "A") // found it
-            {
-                $best_answer = $data;
-                $best_answer_typeid = "A";
-                $a = $records + 10;
-            } else {
-                if ($answer_typeid == "CNAME") // alias
-                {
-                    $best_answer = $data;
-                    $best_answer_typeid = "CNAME";
-                    // and keep going
-                }
+        foreach ($answer as $record) {
+            // found it
+            if ($record->getTypeid() == "A") {
+                $best_answer = $record;
+                break;
             }
 
+            // alias
+            if ($record->getTypeid() == "CNAME") {
+                $best_answer = $record;
+                // and keep going
+            }
         }
 
-        if (($best_answer == "") || ($best_answer_typeid == "")) {
+        if (!isset($best_answer)) {
             return "";
         }
 
-        if ($best_answer_typeid == "A") {
-            return $best_answer;
+        if ($best_answer->getTypeid() == "A") {
+            return $best_answer->getData();
         } // got an IP ok
 
-        if ($best_answer_typeid != "CNAME") {
+        if ($best_answer->getTypeid() != "CNAME") {
             return "";
         } // shouldn't ever happen
 
-        $newtarget = $best_answer; // this is what we now need to resolve
+        $newtarget = $best_answer->getData(); // this is what we now need to resolve
 
         // First is it in the additional section
-        for ($a = 0; $a < $this->lastadditional->count; $a++) {
-            if (($this->lastadditional->results[$a]->domain == $hostname) &&
-                ($this->lastadditional->results[$a]->typeid == "A")
-            ) {
-                return $this->lastadditional->results[$a]->data;
+        foreach ($this->lastadditional as $result) {
+            if (($result->getDomain() == $hostname) && ($result->getTypeid() == "A")) {
+                return $result->getData();
             }
         }
 
         // Not in the results
 
-        return $this->SmartALookup($newtarget, ++$depth);
+        return $this->smartALookup($newtarget, $depth + 1);
     }
+
+    /**
+     * @return DNSAnswer
+     */
+    public function getLastnameservers()
+    {
+        return $this->lastnameservers;
+    }
+
+    /**
+     * @return DNSAnswer
+     */
+    public function getLastadditional()
+    {
+        return $this->lastadditional;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasError()
+    {
+        return $this->error;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLasterror()
+    {
+        return $this->lasterror;
+    }
+
 }

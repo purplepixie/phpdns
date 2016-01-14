@@ -1,13 +1,9 @@
 {
-  "name": "bjdelange/phpdns",
+  "name": "purplepixie/phpdns",
   "authors": [
     {
       "name": "David Cutting",
       "email": "dcutting@purplepixie.org"
-    },
-    {
-      "name": "Bert-Jan de Lange (temporary)",
-      "email": "info@bert-jan.com"
     }
   ],
   "description": "PHP DNS Direct Query Module",
@@ -18,7 +14,7 @@
     }
   },
   "require": {
-    "php": ">=5.1.0"
+    "php": ">=5.3.3"
   },
   "extra": {
     "branch-alias": {

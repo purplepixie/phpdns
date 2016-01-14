@@ -22,58 +22,75 @@ namespace PurplePixie\PhpDns;
  *
  * For more information see www.purplepixie.org/phpdns
  */
-class DNSAnswer
+class DNSAnswer implements \Countable, \Iterator
 {
-    /**
-     * @var int
-     */
-    protected $count = 0;
-
     /**
      * @var DNSResult[]
      */
-    protected $results = array();
+    private $results = array();
 
     /**
-     * @param $type
-     * @param $typeid
-     * @param $class
-     * @param $ttl
-     * @param $data
-     * @param string $domain
-     * @param string $string
-     * @param array $extras
-     * @return int
+     * @param DNSResult $result
      */
-    public function AddResult($type, $typeid, $class, $ttl, $data, $domain = "", $string = "", $extras = array())
+    public function addResult(DNSResult $result)
     {
-        $this->results[$this->count] = new DNSResult();
-        $this->results[$this->count]->type = $type;
-        $this->results[$this->count]->typeid = $typeid;
-        $this->results[$this->count]->class = $class;
-        $this->results[$this->count]->ttl = $ttl;
-        $this->results[$this->count]->data = $data;
-        $this->results[$this->count]->domain = $domain;
-        $this->results[$this->count]->string = $string;
-        $this->results[$this->count]->extras = $extras;
-        $this->count++;
-        return ($this->count - 1);
+        $this->results[] = $result;
     }
 
     /**
+     * Countable
+     *
      * @return int
      */
-    public function getCount()
+    public function count()
     {
-        return $this->count;
+        return count($this->results);
     }
 
     /**
-     * @param int $index
+     * Iterator
+     *
      * @return DNSResult
      */
-    public function getResult($index)
+    public function current()
     {
-        return $this->results[$index];
+        return current($this->results);
     }
+
+    /**
+     * Iterator
+     */
+    public function next()
+    {
+        return next($this->results);
+    }
+
+    /**
+     * Iterator
+     *
+     * @return int
+     */
+    public function key()
+    {
+        return key($this->results);
+    }
+
+    /**
+     * Iterator
+     *
+     * @return bool
+     */
+    public function valid()
+    {
+        return key($this->results) !== null;
+    }
+
+    /**
+     * Iterator
+     */
+    public function rewind()
+    {
+        return reset($this->results);
+    }
+
 }
