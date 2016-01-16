@@ -410,6 +410,15 @@ class DNSQuery
 				
 				$string=$domain." TEXT \"".$data . "\" (in " . $string_count . " strings)";
 				break;
+				
+			case "NAPTR":
+				$buffer = $this->ReadResponse(4);
+				$extras = unpack("norder/npreference",$buffer);
+				$addonitial = $this->ReadDomainLabel();
+				$data = $this->ReadDomainLabel();
+				$extras['service']=$addonitial;
+				$string = $domain." NAPTR ".$data;
+				break;
 
 			default: // something we can't deal with
 				$stuff=$this->ReadResponse($ans_header['length']);
