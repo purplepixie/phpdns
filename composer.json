@@ -1,0 +1,24 @@
+{
+  "name": "purplepixie/phpdns",
+  "authors": [
+    {
+      "name": "David Cutting",
+      "email": "dcutting@purplepixie.org"
+    }
+  ],
+  "description": "PHP DNS Direct Query Module",
+  "license": "GPLv3",
+  "autoload": {
+    "psr-0": {
+      "PurplePixie": "src/"
+    }
+  },
+  "require": {
+    "php": ">=5.3.3"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "2.0-dev"
+    }
+  }
+}
