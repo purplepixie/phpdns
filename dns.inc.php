@@ -2,7 +2,7 @@
 /* -------------------------------------------------------------
 This file is the PurplePixie PHP DNS Query Classes
 
-The software is (C) Copyright 2008-14 PurplePixie Systems
+The software is (C) Copyright 2008-16 PurplePixie Systems
 
 This is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ For more information see www.purplepixie.org/phpdns
 -------------------------------------------------------------- */
 
 //
-// Version 1.05		30th December 2014
+// Version 1.06		16th January 2016
 // David Cutting -- dcutting (some_sort_of_at_sign) purplepixie dot org
 //
 // D Tucny - 2011-06-21 - Add lots more types with RFC references
@@ -51,6 +51,11 @@ For more information see www.purplepixie.org/phpdns
 // D Cutting - 2014-12-30 - Added stream timeout function (thanks to Jorgen Thomsen) [1.04]
 //                          Also corrected some indentation, added comment and updated copyright
 // D Cutting - 2014-12-30 - Corrected error typo (thanks to Jorgen Thomsen) [1.05]
+// D Cutting - 2016-01-16 - Integrated NSEC Support from zatr0z (https://github.com/xatr0z)
+//                          https://github.com/purplepixie/phpdns/pull/1
+// D Cutting - 2016-01-16 - Integrated NAPTR Support from Yurji (https://github.com/Yurij)
+//                          https://github.com/purplepixie/phpdns/pull/4
+// D Cutting - 2016-01-16 - Updated copyright etc to PHP4 final release 1.06
 
 
 class DNSTypes
