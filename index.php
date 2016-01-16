@@ -23,7 +23,10 @@ use PurplePixie\PhpDns\DNSAnswer;
 use PurplePixie\PhpDns\DNSQuery;
 use PurplePixie\PhpDns\DNSTypes;
 
-require 'vendor/autoload.php';
+require_once __DIR__ . 'src/PurplePixie/PhpDns/DNSAnswer.php';
+require_once __DIR__ . 'src/PurplePixie/PhpDns/DNSQuery.php';
+require_once __DIR__ . 'src/PurplePixie/PhpDns/DNSResult.php';
+require_once __DIR__ . 'src/PurplePixie/PhpDns/DNSTypes.php';
 
 // ** IGNORE THIS - It's just the web form ** //
 $server = isset($_REQUEST['server']) ? $_REQUEST['server'] : "127.0.0.1";

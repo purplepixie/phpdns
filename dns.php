@@ -21,7 +21,10 @@ For more information see www.purplepixie.org/phpdns
 -------------------------------------------------------------- */
 use PurplePixie\PhpDns\DNSQuery;
 
-require 'vendor/autoload.php';
+require_once __DIR__ . 'src/PurplePixie/PhpDns/DNSAnswer.php';
+require_once __DIR__ . 'src/PurplePixie/PhpDns/DNSQuery.php';
+require_once __DIR__ . 'src/PurplePixie/PhpDns/DNSResult.php';
+require_once __DIR__ . 'src/PurplePixie/PhpDns/DNSTypes.php';
 
 $server="127.0.0.1";
 $port=53;
