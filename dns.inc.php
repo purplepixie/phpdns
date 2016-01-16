@@ -52,6 +52,7 @@ For more information see www.purplepixie.org/phpdns
 //                          Also corrected some indentation, added comment and updated copyright
 // D Cutting - 2014-12-30 - Corrected error typo (thanks to Jorgen Thomsen) [1.05]
 
+
 class DNSTypes
 {
 	var $types_by_id;
@@ -351,7 +352,12 @@ class DNSQuery
 				$data = base64_encode($this->ReadResponse($ans_header['length'] - 4));
 				$string = $domain." KEY ".$data;
 				break;
-
+                        
+                        case "NSEC":
+                                $data=$this->ReadDomainLabel();
+                                $string=$domain." points to ".$data;
+                                break;
+                                
 			case "MX":
 				$prefs=$this->ReadResponse(2);
 				$prefs=unpack("nlevel",$prefs);
