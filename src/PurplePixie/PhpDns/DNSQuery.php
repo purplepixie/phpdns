@@ -525,7 +525,7 @@ class DNSQuery
                 fclose($socket);
                 return false;
             }
-
+            
             $tmplen = unpack('nlength', $returnsize);
             $datasize = $tmplen['length'];
 

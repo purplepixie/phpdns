@@ -19,12 +19,22 @@ along with this software.  If not, see www.gnu.org/licenses
 
 For more information see www.purplepixie.org/phpdns
 -------------------------------------------------------------- */
+
+// Below is the recommended way to load PHP DNS, with individual
+// classes:
 use PurplePixie\PhpDns\DNSQuery;
 
-require_once __DIR__ . 'src/PurplePixie/PhpDns/DNSAnswer.php';
-require_once __DIR__ . 'src/PurplePixie/PhpDns/DNSQuery.php';
-require_once __DIR__ . 'src/PurplePixie/PhpDns/DNSResult.php';
-require_once __DIR__ . 'src/PurplePixie/PhpDns/DNSTypes.php';
+require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSAnswer.php';
+require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSQuery.php';
+require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSResult.php';
+require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSTypes.php';
+
+// Here is the legacy way (single file to load classes) BUT must
+// now also have the namespace line:
+/*
+require_once("dns.inc.php");
+use PurplePixie\PhpDns\DNSQuery;
+*/
 
 $server="127.0.0.1";
 $port=53;
