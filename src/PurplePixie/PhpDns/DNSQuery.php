@@ -356,7 +356,7 @@ class DNSQuery
                 $buffer = $this->readResponse(20);
                 $extras = unpack('Nserial/Nrefresh/Nretry/Nexpiry/Nminttl', $buffer); // butfix to NNNNN from nnNNN for 1.01
                 $dot = strpos($responsible, '.');
-                if($dot){
+                if($dot !== false){
                     $responsible[$dot] = '@';
                 }
                 $extras['responsible'] = $responsible;
