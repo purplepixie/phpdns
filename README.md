@@ -7,7 +7,8 @@ Changelog
 ---------
 
 ```
-Version 2.0.4 17th January 2016
+Version 2.0.5 29th August 2016
+
 David Cutting -- dcutting (some_sort_of_at_sign) purplepixie dot org
 
 D Tucny - 2011-06-21 - Add lots more types with RFC references
@@ -52,4 +53,6 @@ D Cutting - 2016-01-16 - Merged in changes from bjdelange (2016-01-13) and resol
 D Cutting - 2016-01-17 - Merged updated changes by Bert-Jan de Lange without composer, added legacy files - 1.11
 
 D Cutting - 2016-01-17 - 2.0.4 release
+
+D Cutting - 2016-08-29 - 2.0.5 release: merged changes by Derekholio via github (pull request 7)
 ```
