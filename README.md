@@ -1,6 +1,8 @@
 phpdns
 ======
 
+[![Build Status](https://travis-ci.org/purplepixie/phpdns.svg?branch=master)](https://travis-ci.org/purplepixie/phpdns)
+
 DNS API / Library for PHP - www.purplepixie.org/phpdns/
 
 Changelog
