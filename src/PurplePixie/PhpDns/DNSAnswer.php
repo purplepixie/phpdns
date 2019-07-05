@@ -27,7 +27,7 @@ class DNSAnswer implements \Countable, \Iterator
     /**
      * @var DNSResult[]
      */
-    private $results = array();
+    private $results = [];
 
     /**
      * @param DNSResult $result

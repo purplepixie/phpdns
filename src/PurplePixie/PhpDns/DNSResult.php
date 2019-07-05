@@ -32,7 +32,7 @@ class DNSResult
     /**
      * @var int
      */
-    private $typeid;
+    private $typeId;
 
     /**
      * @var string
@@ -62,25 +62,25 @@ class DNSResult
     /**
      * @var array string
      */
-    private $extras = array();
+    private $extras = [];
 
     /**
      * @param string $type
-     * @param int $typeid
+     * @param int    $typeId
      * @param string $class
-     * @param int $ttl
+     * @param int    $ttl
      * @param string $data
      * @param string $domain
      * @param string $string
-     * @param array $extras
+     * @param array  $extras
      */
-    public function __construct($type, $typeid, $class, $ttl, $data, $domain, $string, array $extras)
+    public function __construct($type, $typeId, $class, $ttl, $data, $domain, $string, array $extras)
     {
-        $this->type = $type;
-        $this->typeid = $typeid;
-        $this->class = $class;
-        $this->ttl = $ttl;
-        $this->data = $data;
+        $this->type   = $type;
+        $this->typeId = $typeId;
+        $this->class  = $class;
+        $this->ttl    = $ttl;
+        $this->data   = $data;
         $this->domain = $domain;
         $this->string = $string;
         $this->extras = $extras;
@@ -97,9 +97,9 @@ class DNSResult
     /**
      * @return int
      */
-    public function getTypeid()
+    public function getTypeId()
     {
-        return $this->typeid;
+        return $this->typeId;
     }
 
     /**

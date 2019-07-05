@@ -51,36 +51,48 @@ $type = isset($_REQUEST['type']) ? $_REQUEST['type'] : "A";
 $question = isset($_REQUEST['question']) ? $_REQUEST['question'] : "www.purplepixie.org";
 
 echo "<html><title>DNS Web Example</title><body>";
-echo "<form action=./ method=get>";
+echo "<form action='./'>";
 echo "<input type=hidden name=doquery value=1>";
-echo "Query <input type=text name=question size=50 value=\"".$question."\"> ";
+echo "Query <input type=text name=question size=50 value=\"" . $question . "\"> ";
 echo "<select name=type>";
-echo "<option value=".$type.">".$type."</option>";
-$types=new DNSTypes();
-$types2=$types->getAllTypeNamesSorted();
+echo "<option value=" . $type . ">" . $type . "</option>";
+$types = new DNSTypes();
+$types2 = $types->getAllTypeNamesSorted();
 foreach ($types2 as $name) {
-	echo "<option value=\"$name\">$name</option>";
+    echo "<option value=\"$name\">$name</option>";
 }
-echo "<option value=SMARTA>SmartA</option>"; 
+echo "<option value=SMARTA>SmartA</option>";
 echo "</select><br>";
-echo "on nameserver <input type=text name=server size=30 value=\"".$server."\"> ";
-echo "port <input type=text name=port size=4 value=\"".$port."\"><br>";
+echo "on nameserver <input type=text name=server size=30 value=\"" . $server . "\"> ";
+echo "port <input name=port size=4 value=\"" . $port . "\"><br>";
 
-if (!$udp) $s=" checked";
-else $s="";
-echo "<input type=checkbox name=tcp value=1".$s."> use TCP, ";
+if (!$udp) {
+    $s = " checked";
+} else {
+    $s = "";
+}
+echo "<input type=checkbox name=tcp value=1" . $s . "> use TCP, ";
 
-if ($debug) $s=" checked";
-else $s="";
-echo "<input type=checkbox name=debug value=1".$s."> show debug, ";
+if ($debug) {
+    $s = " checked";
+} else {
+    $s = "";
+}
+echo "<input type=checkbox name=debug value=1" . $s . "> show debug, ";
 
-if ($binarydebug) $s=" checked";
-else $s="";
-echo "<input type=checkbox name=binarydebug value=1".$s."> show binary,";
+if ($binarydebug) {
+    $s = " checked";
+} else {
+    $s = "";
+}
+echo "<input type=checkbox name=binarydebug value=1" . $s . "> show binary,";
 
-if ($extendanswer) $s=" checked";
-else $s="";
-echo "<input type=checkbox name=extendanswer value=1".$s."> show detail<br>";
+if ($extendanswer) {
+    $s = " checked";
+} else {
+    $s = "";
+}
+echo "<input type=checkbox name=extendanswer value=1" . $s . "> show detail<br>";
 
 echo "<input type=submit value=\"Perform DNS Query\"><br>";
 
@@ -90,35 +102,35 @@ echo "<input type=submit value=\"Perform DNS Query\"><br>";
 if (isset($_REQUEST['doquery'])) {
     echo "<pre>";
 
-    $query=new DNSQuery($server,$port,$timeout,$udp,$debug,$binarydebug);
+    $query = new DNSQuery($server, $port, $timeout, $udp, $debug, $binarydebug);
 
-    if ($type=="SMARTA") {
-        echo "Smart A Lookup for ".$question."\n\n";
-        $hostname=$query->smartALookup($question);
-        echo "Result: ".$hostname."\n\n";
+    if ($type == "SMARTA") {
+        echo "Smart A Lookup for " . $question . "\n\n";
+        $hostname = $query->smartALookup($question);
+        echo "Result: " . $hostname . "\n\n";
         echo "</pre>";
         exit();
     }
 
-    echo "Querying: ".$question." -t ".$type." @".$server."\n";
+    echo "Querying: " . $question . " -t " . $type . " @" . $server . "\n";
 
-    $result=$query->query($question,$type);
+    $result = $query->query($question, $type);
 
     if ($query->hasError()) {
-        echo "\nQuery Error: ".$query->getLasterror()."\n\n";
+        echo "\nQuery Error: " . $query->getLastError() . "\n\n";
         exit();
     }
 
-    echo "Returned ".count($result)." Answers\n\n";
+    echo "Returned " . count($result) . " Answers\n\n";
 
     ShowSection($result);
 
     if ($extendanswer) {
-        echo "\nNameserver Records: ".count($query->getLastnameservers())."\n";
-        ShowSection($query->getLastnameservers());
+        echo "\nNameserver Records: " . count($query->getLastNameservers()) . "\n";
+        ShowSection($query->getLastNameservers());
 
-        echo "\nAdditional Records: ".count($query->getLastadditional())."\n";
-        ShowSection($query->getLastadditional());
+        echo "\nAdditional Records: " . count($query->getLastAdditional()) . "\n";
+        ShowSection($query->getLastAdditional());
     }
 
     echo "</pre>";
@@ -129,10 +141,10 @@ function ShowSection(DNSAnswer $result)
     global $extendanswer;
 
     foreach ($result as $index => $record) {
-        echo $index.". ";
+        echo $index . ". ";
 
-        if ($record->getString()=="") {
-            echo $record->getTypeid() . "(" . $record->getType() . ") => " . $record->getData();
+        if ($record->getString() == "") {
+            echo $record->getTypeId() . "(" . $record->getType() . ") => " . $record->getData();
         } else {
             echo $record->getString();
         }
@@ -140,14 +152,14 @@ function ShowSection(DNSAnswer $result)
         echo "\n";
 
         if ($extendanswer) {
-            echo " - record type = ".$record->getTypeid()." (# ".$record->getType().")\n";
-            echo " - record data = ".$record->getData()."\n";
-            echo " - record ttl = ".$record->getTtl()."\n";
+            echo " - record type = " . $record->getTypeId() . " (# " . $record->getType() . ")\n";
+            echo " - record data = " . $record->getData() . "\n";
+            echo " - record ttl = " . $record->getTtl() . "\n";
 
             // additional data
             if (count($record->getExtras()) > 0) {
-                foreach($record->getExtras() as $key => $val) {
-                    echo " + ".$key." = ".$val."\n";
+                foreach ($record->getExtras() as $key => $val) {
+                    echo " + " . $key . " = " . $val . "\n";
                 }
             }
         }

@@ -75,14 +75,14 @@ echo "Querying: ".$question." -t ".$type." @".$server."\n";
 $result=$query->query($question,$type);
 
 if ($query->hasError()) {
-    echo "Query Error: " . $query->getLasterror() . "\n";
+    echo "Query Error: " . $query->getLastError() . "\n";
     exit();
 }
 
 echo "Returned ".count($result)." Answers\n";
 
 foreach ($result as $index => $record) {
-    echo $index . ". " . $record->getTypeid() . "(" . $record->getType() . ") => " . $record->getData() . " [";
+    echo $index . ". " . $record->getTypeId() . "(" . $record->getType() . ") => " . $record->getData() . " [";
     echo $record->getString();
     echo "]\n";
 
