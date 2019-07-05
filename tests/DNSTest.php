@@ -20,7 +20,7 @@ class DNSTest extends TestCase
 	 */
 	public function testConstructorNoServer()
 	{
-        $this->expectException('ArgumentCountError');
+        $this->expectException(\ArgumentCountError::class);
 		$d = new DNSQuery();
 		$this->assertInstanceOf('PurplePixie\\PhpDns\\DNSQuery', $d);
 		return $d;
