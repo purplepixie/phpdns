@@ -5,26 +5,8 @@ use PurplePixie\PhpDns\DNSQuery;
 
 class DNSTest extends TestCase
 {
-	protected function setUp()
-	{
-		set_error_handler(array($this, 'errorHandler'));
-	}
-
-	public function errorHandler($errno, $errstr, $errfile, $errline)
-	{
-		throw new \InvalidArgumentException(
-			sprintf(
-				'Missing argument. %s %s %s %s',
-				$errno,
-				$errstr,
-				$errfile,
-				$errline
-				)
-			);
-	}
-
 	/**
-	 * @covers \PurplePixie\PhpDns\DNSQuery::_construct
+	 * @covers \PurplePixie\PhpDns\DNSQuery::__construct
 	 */
 	public function testConstructor()
 	{
@@ -34,11 +16,11 @@ class DNSTest extends TestCase
 	}
 
 	/**
-	 * @covers \PurplePixie\PhpDns\DNSQuery::_construct
-	 * @expectedException \InvalidArgumentException
+	 * @covers \PurplePixie\PhpDns\DNSQuery::__construct
 	 */
 	public function testConstructorNoServer()
 	{
+        $this->expectException('ArgumentCountError');
 		$d = new DNSQuery();
 		$this->assertInstanceOf('PurplePixie\\PhpDns\\DNSQuery', $d);
 		return $d;
