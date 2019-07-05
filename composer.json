@@ -7,7 +7,7 @@
     }
   ],
   "description": "PHP DNS Direct Query Module. A updated fork of purplepixie/phpdns",
-  "license": "LGPLv3",
+  "license": "LGPL-3.0-or-later",
   "autoload": {
     "psr-0": {
       "PurplePixie": "src/"
