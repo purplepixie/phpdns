@@ -28,19 +28,19 @@ The following is an example script to perform an A record (IP address)
 lookup
 
 ```php
-<?php
 // A simple DNS query example
+require("vendor/autoload.php"); // Require API Source
 
-require("dns.inc.php"); // Require API Source
-$dns_server="ns.somehost.com"; // Our DNS Server
+use PurplePixie\PhpDns\DNSQuery;
 
-$dns_query=new DNSQuery($dns_server); // create DNS Query object - there
-are other options we could pass here
+$dns_server = "ns.somehost.com"; // Our DNS Server
 
-$question="www.somehost.com"; // the question we will ask
-$type="A"; // the type of response(s) we want for this question
+$dns_query = new DNSQuery($dns_server); // create DNS Query object - there are other options we could pass here
 
-$result=$dns_query->Query($question,$type); // do the query
+$question = "www.somehost.com"; // the question we will ask
+$type = "A"; // the type of response(s) we want for this question
+
+$result = $dns_query->Query($question, $type); // do the query
 
 // Trap Errors
 
@@ -54,9 +54,9 @@ if ( ($result===false) || ($dns_query->error!=0) ) // error occurred
 
 $result_count=$result->count; // number of results returned
 
-for ($a=0; $a<$result_count; $a++)
+for ($a=0; $a < $result_count; $a++)
   {
-  if ($result->results[$a]->typeid=="A") // only after A records
+  if ($result->results[$a]->typeid == "A") // only after A records
     {     echo $question." has IP address
 ".$result->results[$a]->data."<br>";
     echo $result->results[$a]->string."<br>";
