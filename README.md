@@ -1,60 +1,173 @@
-phpdns
-======
+﻿# phpdns
 
 [![Build Status](https://travis-ci.org/purplepixie/phpdns.svg?branch=master)](https://travis-ci.org/purplepixie/phpdns)
 
-DNS API / Library for PHP - www.purplepixie.org/phpdns/
+The PHP DNS Query is a GPL set of PHP classes providing a direct domain name service API. Originally developed to be a testing module for the [FreeNATS](http://www.purplepixie.org/freenats/) network monitor I decided to package it up as a standalone API as well.
 
-Changelog
----------
+Although there are plenty of other DNS classes/clients out there I found them to either be too overblown or actually non-functional. This API is intended to be a half-way house offering direct to-server queries, the ability to process the response in detail but still with a simple interface for the programmer.
 
+## Usage Guide
+
+### Using the DNS Query API
+
+You can use the DNS query API from within PHP (version 4 or later) and
+it requires no special raw socket permissions so should operate
+correctly in most environments.
+
+To use the API you must create a DNS Query object (with a DNS server
+hostname/IP and other optional parameters), perform a query (either a
+full query where you specify the type of result or a smart A lookup
+<#SmartALookup>) and deal with the answer.
+
+The answer will either be false if an error occured (see the code below
+for an example error trap) or a DNSAnswer object containing a "count"
+property (the number of records returned as answers) and an array of
+DNSResult objects containing each answer given to the query.
+
+The following is an example script to perform an A record (IP address)
+lookup
+
+```php
+<?php
+// A simple DNS query example
+
+require("dns.inc.php"); // Require API Source
+$dns_server="ns.somehost.com"; // Our DNS Server
+
+$dns_query=new DNSQuery($dns_server); // create DNS Query object - there
+are other options we could pass here
+
+$question="www.somehost.com"; // the question we will ask
+$type="A"; // the type of response(s) we want for this question
+
+$result=$dns_query->Query($question,$type); // do the query
+
+// Trap Errors
+
+if ( ($result===false) || ($dns_query->error!=0) ) // error occurred
+  {
+  echo $dns_query->lasterror;
+  exit();
+  }
+
+//Process Results
+
+$result_count=$result->count; // number of results returned
+
+for ($a=0; $a<$result_count; $a++)
+  {
+  if ($result->results[$a]->typeid=="A") // only after A records
+    {     echo $question." has IP address
+".$result->results[$a]->data."<br>";
+    echo $result->results[$a]->string."<br>";
+    }
+  }
 ```
-Version 2.0.5 29th August 2016
 
-David Cutting -- dcutting (some_sort_of_at_sign) purplepixie dot org
+Which if all goes well should output something like...
 
-D Tucny - 2011-06-21 - Add lots more types with RFC references
-D Tucny - 2011-06-21 - Add decoding of IPv6 addresses in AAAA RRs and sorted handling alphabetically
-D Tucny - 2011-06-21 - Switch to using inet_ntop function where available to decode IP addresses
-                       and include binary IP in extras
-D Tucny - 2011-06-21 - Add fallback inet_ntop function (sourced from php.net) for
-                       platforms missing it
-D Tucny - 2011-06-21 - Correct string extraction for TXT records 
-                       (a TXT record can contain one of more 255 character strings 
-                       with an initial length byte that are concatenated togeter) 
-                       the length bytes were being included in the result as part of the text
-D Tucny - 2011-06-21 - Add decoding of SPF as an alias of TXT due to identical formatting
-D Tucny - 2011-06-21 - Make binarydebug a parameter of DNSQuery in addition to plain debug
-D Tucny - 2011-06-21 - Add header flag parsing
-D Tucny - 2011-06-21 - Add error handling for truncation flag being set when using UDP, i.e response too large
-D Tucny - 2011-06-21 - Add decoding of SRV RRs
-D Tucny - 2011-06-22 - Add initial decoding of DNSKEY RRs
+* www.somehost.com has IP address 10.2.3.4
+* www.somehost.com has address 10.2.3.4
 
-D Cutting - 2012-06-22 - Added special case "." query for root-servers
-D Cutting - 2012-06-22 - Fixed . positioning bug in 0.04
+The first output is from our script writing the question and the "data"
+result, the second when we output the "string" property of the answer
+which is the specific record in human-readable form (if the type is known).
 
-Remi Smith - 2013-05-23 - Alternative AAAA IPV6 Patching for 0.02 (included into general build - DC)
-D Cutting - 2013-08-04 - Implemented bugfix for Serial and TTL provided by Kim Akero
-D Cutting - 2014-02-21 - Implemented DNSKEY type recovery from data packet
-D Cutting - 2014-11-19 - Fixed fsockopen bug (BID396) thanks to semperfi on forum
-D Cutting - 2014-12-30 - Added stream timeout function (thanks to Jorgen Thomsen) [1.04]
-                         Also corrected some indentation, added comment and updated copyright
-D Cutting - 2014-12-30 - Corrected error typo (thanks to Jorgen Thomsen) [1.05]
+> **A Note of Warning and Why Check the Answer Type Above**
 
-Bert-Jan de Lange - 2016-01-13 - Convert to PHP5, PSR-0, composer|2.0-dev
+DNS is not an entirely straightforward protocol and things which on the
+surface may seem simple may not be when you delve deeper (if you already
+understand DNS then skip ahead).
 
-D Cutting - 2016-01-16 - Integrated NSEC Support from zatr0z (https://github.com/xatr0z)
-                         https://github.com/purplepixie/phpdns/pull/1
-D Cutting - 2016-01-16 - Integrated NAPTR Support from Yurji (https://github.com/Yurij)
-                         https://github.com/purplepixie/phpdns/pull/4
-D Cutting - 2016-01-16 - Updated copyright etc to PHP4 final release 1.06
+For example an IP lookup (A record lookup) for a host on a specific DNS
+server may well not just return a single answer record containing the IP
+address. The host may be multi-honed and return multiple records any
+which may not be an IP address but a CNAME alias. The nameserver you are
+querying may not do a recursive or cache lookup for you and so return no
+answers even though the domain and host do exist.
 
-D Cutting - 2016-01-16 - Merged in changes from bjdelange (2016-01-13) and resolved conflicts for 1.10
-                         https://github.com/purplepixie/phpdns/pull/5
-                         by https://github.com/bjdelange
-D Cutting - 2016-01-17 - Merged updated changes by Bert-Jan de Lange without composer, added legacy files - 1.11
+For this reason we must actually process the results (unless of course
+we just want to see what data is provided for a query and not actually
+do anything with that answer).
 
-D Cutting - 2016-01-17 - 2.0.4 release
+Hosts with just a CNAME alias will not be resolved to an IP address in
+the answer section. If we ask for the A record of www.somehost.com we
+may just get back a CNAME of webhost.somehost.com. To turn this into an
+IP address we must then either hope it was provided in the additional
+answer section (and check - see below for details) or perform another A
+record lookup on webhost.somehost.com.
 
-D Cutting - 2016-08-29 - 2.0.5 release: merged changes by Derekholio via github (pull request 7)
-```
+If you just want an IP address for a host then either PHP's inbuilt
+gethostbyname() <http://www.php.net/> or this API's SmartALookup()
+<#SmartALookup> are probably what you're after rather than a full blown
+query.
+
+### Answer and Query Types
+
+Record (query and result) types the API supports will should return
+sensible data for are: A, NS, PTR, MX, CNAME, TXT and SOA.
+
+Asking for an unsupported type will cause the query to fail. Unsupported
+types which are returned as result records will have null "string" and
+"typeid" properties but will contain the binary data in "data" and the
+decimal record type in "type".
+
+### Answer Results
+
+If a query succeeds it returns a DNSAnswer object containing a counter
+property "count" indicating the number of answer records returned and an
+array of DNSResult objects containing each of these records in turn.
+
+The DNSAnswer object breaks down as follows:
+$answer->count 	Number of answer records contained
+$answer->results[x]->typeid 	Textual record type ID (A, MX, CNAME etc)
+$answer->results[x]->type 	Numeric record type (decimal)
+$answer->results[x]->class 	Numeric class type (decimal)
+$answer->results[x]->data 	Data returned (i.e. IP address or hostname)
+$answer->results[x]->domain 	Domain name data is for
+$answer->results[x]->string 	String representation of the answer (i.e.
+www.fish.sea has address x.y.z)
+$answer->results[x]->extras 	Type-specific array of extra fields (i.e.
+"level" for MX exchanges) - see below
+
+### Type-specific Extras
+
+Some result types have extended extra information which will be in array
+form in the "extras" property of a DNSResult object.
+
+MX record types have the decimal mail exchange priority in extas['level']
+
+SOA record types have the responsible contact for the domain in
+extras['responsible'] as well as the following:
+extras['serial'] - domain serial
+extras['refresh'] - domain refresh
+extras['retry'] - domain retry
+extras['expiry'] - domain expiry
+extras['minttl'] - domain mimumum time-to-live (ttl)
+
+### Smart A Lookup
+
+Because doing an A lookup won't always return an IP address and
+sometimes you're just after an IP address (not potentially a list of
+them and aliases etc) the DNSQuery class provides the SmartALookup()
+method.
+
+This function simply takes a hostname and returns an IP address or a
+null string if lookup failed (you can then check the DNSQuery lasterror
+property to see if the query actually failed or just returned no results).
+
+If the result data contains an IP address it will be returned (first
+preference). If no IP addresses were provided but an alias CNAME is
+given then this will be looked up (recursing up to a depth of five
+aliases).
+
+In effect this is a nameserver-specific version of gethostbyname() but returns a null string rather than the unmodified IP on failure.
+
+## More Information
+
+The technical documentation can be found here
+<https://github.com/purplepixie/phpdns/DNSQueryAPITechnicalDocs.md>
+
+------------------------------------------------------------------------
+[phpdns](http://www.purplepixie.org/phpdns) © Copyright 2008-2014
+[PurplePixie Systems](http://www.purplepixie.org), all rights reserved, licensed under the [GNU](http://www.gnu.org/) [GPL](http://www.gnu.org/licences/gpl.html). Bugs, errata and comments should be posted to the [issues](https://github.com/purplepixie/phpdns/issues) tracker.
