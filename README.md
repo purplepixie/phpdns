@@ -33,35 +33,37 @@ require("vendor/autoload.php"); // Require API Source
 
 use PurplePixie\PhpDns\DNSQuery;
 
-$dns_server = "ns.somehost.com"; // Our DNS Server
+// Your DNS Server
+$dns_server = "ns.somehost.com"; 
 
-$dns_query = new DNSQuery($dns_server); // create DNS Query object - there are other options we could pass here
+// create DNS Query object - there are other options we could pass here
+$dns_query = new DNSQuery($dns_server);
 
-$question = "www.somehost.com"; // the question we will ask
-$type = "A"; // the type of response(s) we want for this question
+// the question we will ask
+$question = "www.somehost.com";
 
-$result = $dns_query->Query($question, $type); // do the query
+// the type of response(s) we want for this question
+$type = "A";
+
+// do the query
+$result = $dns_query->query($question, $type); 
 
 // Trap Errors
-
-if ( ($result===false) || ($dns_query->error!=0) ) // error occurred
-  {
-  echo $dns_query->lasterror;
-  exit();
-  }
+if ($dns_query->->hasError()) {
+    // error occurred
+    echo $dns_query->getLastError();
+    exit();
+}
 
 //Process Results
-
-$result_count=$result->count; // number of results returned
-
-for ($a=0; $a < $result_count; $a++)
-  {
-  if ($result->results[$a]->typeid == "A") // only after A records
-    {     echo $question." has IP address
-".$result->results[$a]->data."<br>";
-    echo $result->results[$a]->string."<br>";
+$count = $result->count(); // number of results returned
+foreach ($result as $result_count) {
+    // only after A records
+    if ($result_count->getTypeId() == "A") {
+        echo $question." has IP address ".$result_count->getData()."<br>";
+        echo $result_count->getString()."<br>";
     }
-  }
+}
 ```
 
 Which if all goes well should output something like...
