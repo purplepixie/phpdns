@@ -1,6 +1,6 @@
 ﻿# phpdns
 
-[![Build Status](https://travis-ci.org/purplepixie/phpdns.svg?branch=master)](https://travis-ci.org/purplepixie/phpdns)
+[![Build Status](https://travis-ci.org/techno-express/phpdns.svg?branch=master)](https://travis-ci.org/techno-express/phpdns)
 
 The PHP DNS Query is a GPL set of PHP classes providing a direct domain name service API. Originally developed to be a testing module for the [FreeNATS](http://www.purplepixie.org/freenats/) network monitor I decided to package it up as a standalone API as well.
 
@@ -166,7 +166,7 @@ In effect this is a nameserver-specific version of gethostbyname() but returns a
 ## More Information
 
 The technical documentation can be found here
-<https://github.com/purplepixie/phpdns/DNSQueryAPITechnicalDocs.md>
+<https://github.com/techno-express/phpdns/wiki/DNS-Query-API-Technical-Docs>
 
 ------------------------------------------------------------------------
 [phpdns](http://www.purplepixie.org/phpdns) © Copyright 2008-2014
