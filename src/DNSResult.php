@@ -74,7 +74,7 @@ class DNSResult
      * @param string $string
      * @param array  $extras
      */
-    public function __construct($type, $typeId, $class, $ttl, $data, $domain, $string, array $extras)
+    public function __construct($typeId, $type, $class, $ttl, $data, $domain, $string, array $extras)
     {
         $this->type   = $type;
         $this->typeId = $typeId;

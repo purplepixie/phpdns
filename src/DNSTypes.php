@@ -74,7 +74,8 @@ class DNSTypes
         if (false !== $index = array_search($name, $this->types, true)) {
             return $index;
         }
-        return 0;
+
+        return false;
     }
 
     /**

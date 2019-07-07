@@ -112,8 +112,11 @@ class DNSQuery
      * @param bool   $debug
      * @param bool   $binaryDebug
      */
-    public function __construct($server, $port = 53, $timeout = 60, $udp = true, $debug = false, $binaryDebug = false)
+    public function __construct($server = null, $port = 53, $timeout = 60, $udp = true, $debug = false, $binaryDebug = false)
     {
+        if (empty($server))
+            throw new \InvalidArgumentException('Missing server argument');
+
         $this->server = $server;
         $this->port = $port;
         $this->timeout = $timeout;
@@ -153,25 +156,25 @@ class DNSQuery
         $errno = 0;
         $errstr = '';
 
-        if (!$socket = fsockopen($host, $this->port, $errno, $errstr, $this->timeout)) {
+        if (!$socket = @\fsockopen($host, $this->port, $errno, $errstr, $this->timeout)) {
             $this->setError('Failed to Open Socket');
             throw new \Exception('Failed to Open Socket');
         }
 
         // handles timeout on stream read set using timeout as well
-        stream_set_timeout($socket, $this->timeout);
+        \stream_set_timeout($socket, $this->timeout);
 
         // Split Into Labels
-        if (preg_match('/[a-z|A-Z]/', $question) == 0 && $question != '.') { // IP Address
+        if (\preg_match('/[a-z|A-Z]/', $question) == 0 && $question != '.') { // IP Address
             // reverse ARPA format
-            $labels = array_reverse(explode('.', $question));
+            $labels = \array_reverse(\explode('.', $question));
             $labels[] = 'IN-ADDR';
             $labels[] = 'ARPA';
         } else {
             if ($question == '.') {
                 $labels = [''];
             } else { // hostname
-                $labels = explode('.', $question);
+                $labels = \explode('.', $question);
             }
         }
 
@@ -179,8 +182,8 @@ class DNSQuery
 
         foreach ($labels as $label) {
             if ($label != '') {
-                $size = strlen($label);
-                $question_binary .= pack('C', $size); // size byte first
+                $size = \strlen($label);
+                $question_binary .= \pack('C', $size); // size byte first
                 $question_binary .= $label; // then the label
             }
         }
@@ -189,7 +192,7 @@ class DNSQuery
 
         $this->debug('Question: ' . $question . ' (type=' . $type . '/' . $typeId . ')');
 
-        $id = rand(1, 255) | (rand(0, 255) << 8);    // generate the ID
+        $id = \rand(1, 255) | (\rand(0, 255) << 8);    // generate the ID
 
         // Set standard codes and flags
         $flags = 0x0100 & 0x0300; // recursion & queryspecmask
@@ -197,71 +200,71 @@ class DNSQuery
 
         // Build the header
         $header = '';
-        $header .= pack('n', $id);
-        $header .= pack('n', $opcode | $flags);
-        $header .= pack('nnnn', 1, 0, 0, 0);
+        $header .= \pack('n', $id);
+        $header .= \pack('n', $opcode | $flags);
+        $header .= \pack('nnnn', 1, 0, 0, 0);
         $header .= $question_binary;
-        $header .= pack('n', $typeId);
-        $header .= pack('n', 0x0001); // internet class
-        $headersize = strlen($header);
-        $headersizebin = pack('n', $headersize);
+        $header .= \pack('n', $typeId);
+        $header .= \pack('n', 0x0001); // internet class
+        $headersize = \strlen($header);
+        $headersizebin = \pack('n', $headersize);
 
         $this->debug('Header Length: ' . $headersize . ' Bytes');
         $this->debugBinary($header);
 
         if (($this->udp) && ($headersize >= 512)) {
             $this->setError('Question too big for UDP (' . $headersize . ' bytes)');
-            fclose($socket);
+            \fclose($socket);
             throw new \Exception('Question too big for UDP (' . $headersize . ' bytes)');
         }
 
         if ($this->udp) { // UDP method
-            if (!fwrite($socket, $header, $headersize)) {
+            if (!\fwrite($socket, $header, $headersize)) {
                 $this->setError('Failed to write question to socket');
-                fclose($socket);
+                \fclose($socket);
                 throw new \Exception('Failed to write question to socket');
             }
 
-            if (!$this->rawBuffer = fread($socket, 4096)) { // read until the end with UDP
+            if (!$this->rawBuffer = \fread($socket, 4096)) { // read until the end with UDP
                 $this->setError('Failed to read data buffer');
-                fclose($socket);
+                \fclose($socket);
                 throw new \Exception('Failed to read data buffer');
             }
         } else { // TCP
             // write the socket
-            if (!fwrite($socket, $headersizebin)) {
+            if (!\fwrite($socket, $headersizebin)) {
                 $this->setError('Failed to write question length to TCP socket');
-                fclose($socket);
+                \fclose($socket);
                 throw new \Exception('Failed to write question length to TCP socket');
             }
 
-            if (!fwrite($socket, $header, $headersize)) {
+            if (!\fwrite($socket, $header, $headersize)) {
                 $this->setError('Failed to write question to TCP socket');
-                fclose($socket);
+                \fclose($socket);
                 throw new \Exception('Failed to write question to TCP socket');
             }
 
-            if (!$returnsize = fread($socket, 2)) {
+            if (!$returnsize = \fread($socket, 2)) {
                 $this->setError('Failed to read size from TCP socket');
-                fclose($socket);
+                \fclose($socket);
                 throw new \Exception('Failed to read size from TCP socket');
             }
 
-            $tmplen = unpack('nlength', $returnsize);
+            $tmplen = \unpack('nlength', $returnsize);
             $datasize = $tmplen['length'];
 
             $this->debug('TCP Stream Length Limit ' . $datasize);
 
-            if (!$this->rawBuffer = fread($socket, $datasize)) {
+            if (!$this->rawBuffer = \fread($socket, $datasize)) {
                 $this->setError('Failed to read data buffer');
-                fclose($socket);
+                \fclose($socket);
                 throw new \Exception('Failed to read data buffer');
             }
         }
 
-        fclose($socket);
+        \fclose($socket);
 
-        $bufferSize = strlen($this->rawBuffer);
+        $bufferSize = \strlen($this->rawBuffer);
 
         $this->debug('Read Buffer Size ' . $bufferSize);
 
@@ -270,14 +273,14 @@ class DNSQuery
             throw new \Exception('Return Buffer too Small');
         }
 
-        $this->rawHeader = substr($this->rawBuffer, 0, 12); // first 12 bytes is the header
-        $this->rawResponse = substr($this->rawBuffer, 12); // after that the response
+        $this->rawHeader = \substr($this->rawBuffer, 0, 12); // first 12 bytes is the header
+        $this->rawResponse = \substr($this->rawBuffer, 12); // after that the response
 
         $this->responseCounter = 12; // start parsing response counter from 12 - no longer using response so can do pointers
 
         $this->debugBinary($this->rawBuffer);
 
-        $this->header = unpack('nid/nspec/nqdcount/nancount/nnscount/narcount', $this->rawHeader);
+        $this->header = \unpack('nid/nspec/nqdcount/nancount/nnscount/narcount', $this->rawHeader);
 
         $id = $this->header['id'];
 
@@ -310,7 +313,7 @@ class DNSQuery
                 $c = 1;
 
                 while ($c != 0) {
-                    $c = hexdec(bin2hex($this->readResponse(1)));
+                    $c = \hexdec(\bin2hex($this->readResponse(1)));
                 }
 
                 $this->readResponse(4);
@@ -459,10 +462,10 @@ class DNSQuery
     {
         if ($offset == '') {
             // no offset so use and increment the ongoing counter
-            $return = substr($this->rawBuffer, $this->responseCounter, $count);
+            $return = \substr($this->rawBuffer, $this->responseCounter, $count);
             $this->responseCounter += $count;
         } else {
-            $return = substr($this->rawBuffer, $offset, $count);
+            $return = \substr($this->rawBuffer, $offset, $count);
         }
 
         return $return;
@@ -481,7 +484,7 @@ class DNSQuery
         $return = false;
 
         while (!$return) {
-            $label_len = ord($this->readResponse(1, $offset++));
+            $label_len = \ord($this->readResponse(1, $offset++));
 
             if ($label_len <= 0) {
                 $return = true;
@@ -520,7 +523,7 @@ class DNSQuery
     {
         $count = 0;
         $labels = $this->readDomainLabels($this->responseCounter, $count);
-        $domain = implode('.', $labels);
+        $domain = \implode('.', $labels);
 
         $this->responseCounter += $count;
 
@@ -548,9 +551,9 @@ class DNSQuery
             return;
         }
 
-        for ($a = 0; $a < strlen($data); $a++) {
-            $hex = bin2hex($data[$a]);
-            $dec = hexdec($hex);
+        for ($a = 0; $a < \strlen($data); $a++) {
+            $hex = \bin2hex($data[$a]);
+            $dec = \hexdec($hex);
 
             echo $a;
             echo "\t";
@@ -603,7 +606,7 @@ class DNSQuery
         $domain = $this->readDomainLabel();
 
         $ansHeaderBin = $this->readResponse(10); // 10 byte header
-        $ansHeader = unpack('ntype/nclass/Nttl/nlength', $ansHeaderBin);
+        $ansHeader = \unpack('ntype/nclass/Nttl/nlength', $ansHeaderBin);
 
         $this->debug('Record Type ' . $ansHeader['type'] . ' Class ' . $ansHeader['class'] . ' TTL ' . $ansHeader['ttl'] . ' Length ' . $ansHeader['length']);
 
@@ -615,7 +618,7 @@ class DNSQuery
         switch ($typeId) {
             case 'A':
                 $ipBin = $this->readResponse(4);
-                $ip = inet_ntop($ipBin);
+                $ip = \inet_ntop($ipBin);
                 $data = $ip;
                 $extras['ipBin'] = $ipBin;
                 $string = $domain . ' has IPv4 address ' . $ip;
@@ -623,7 +626,7 @@ class DNSQuery
 
             case 'AAAA':
                 $ipBin = $this->readResponse(16);
-                $ip = inet_ntop($ipBin);
+                $ip = \inet_ntop($ipBin);
                 $data = $ip;
                 $extras['ipBin'] = $ipBin;
                 $string = $domain . ' has IPv6 address ' . $ip;
@@ -644,12 +647,12 @@ class DNSQuery
                 $stuff = $this->readResponse(4);
 
                 // key type test 21/02/2014 DC
-                $test = unpack('nflags/cprotocol/calgo', $stuff);
+                $test = \unpack('nflags/cprotocol/calgo', $stuff);
                 $extras['flags'] = $test['flags'];
                 $extras['protocol'] = $test['protocol'];
                 $extras['algorithm'] = $test['algo'];
 
-                $data = base64_encode($this->readResponse($ansHeader['length'] - 4));
+                $data = \base64_encode($this->readResponse($ansHeader['length'] - 4));
                 $string = $domain . ' KEY ' . $data;
                 break;
 
@@ -660,7 +663,7 @@ class DNSQuery
 
             case 'MX':
                 $prefs = $this->readResponse(2);
-                $prefs = unpack('nlevel', $prefs);
+                $prefs = \unpack('nlevel', $prefs);
                 $extras['level'] = $prefs['level'];
                 $data = $this->readDomainLabel();
                 $string = $domain . ' mailserver ' . $data . ' (pri=' . $extras['level'] . ')';
@@ -683,9 +686,9 @@ class DNSQuery
                 $responsible = $this->readDomainLabel();
 
                 $buffer = $this->readResponse(20);
-                $extras = unpack('Nserial/Nrefresh/Nretry/Nexpiry/Nminttl',
+                $extras = \unpack('Nserial/Nrefresh/Nretry/Nexpiry/Nminttl',
                     $buffer); // butfix to NNNNN from nnNNN for 1.01
-                $dot = strpos($responsible, '.');
+                $dot = \strpos($responsible, '.');
                 if ($dot !== false) {
                     $responsible[$dot] = '@';
                 }
@@ -695,7 +698,7 @@ class DNSQuery
 
             case 'SRV':
                 $prefs = $this->readResponse(6);
-                $prefs = unpack('npriority/nweight/nport', $prefs);
+                $prefs = \unpack('npriority/nweight/nport', $prefs);
                 $extras['priority'] = $prefs['priority'];
                 $extras['weight'] = $prefs['weight'];
                 $extras['port'] = $prefs['port'];
@@ -707,8 +710,8 @@ class DNSQuery
             case 'SPF':
                 $data = '';
 
-                for ($string_count = 0; strlen($data) + (1 + $string_count) < $ansHeader['length']; $string_count++) {
-                    $string_length = ord($this->readResponse(1));
+                for ($string_count = 0; \strlen($data) + (1 + $string_count) < $ansHeader['length']; $string_count++) {
+                    $string_length = \ord($this->readResponse(1));
                     $data .= $this->readResponse($string_length);
                 }
 
@@ -717,7 +720,7 @@ class DNSQuery
 
             case "NAPTR":
                 $buffer = $this->ReadResponse(4);
-                $extras = unpack("norder/npreference", $buffer);
+                $extras = \unpack("norder/npreference", $buffer);
                 $addonitial = $this->ReadDomainLabel();
                 $data = $this->ReadDomainLabel();
                 $extras['service'] = $addonitial;
