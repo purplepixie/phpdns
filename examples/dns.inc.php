@@ -23,8 +23,7 @@ For more information see www.purplepixie.org/phpdns
 // This file loads the required libraries from the /src/ directory
 // to mimic legacy behaviour and allow a single-file include.
 
-require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSAnswer.php';
-require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSQuery.php';
-require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSResult.php';
-require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSTypes.php';
-?>
+require_once __DIR__ . '/src/DNSAnswer.php';
+require_once __DIR__ . '/src/DNSQuery.php';
+require_once __DIR__ . '/src/DNSResult.php';
+require_once __DIR__ . '/src/DNSTypes.php';
