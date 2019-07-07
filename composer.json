@@ -1,12 +1,12 @@
 {
-  "name": "purplepixie/phpdns",
+  "name": "forked/phpdns",
   "authors": [
     {
       "name": "David Cutting",
       "email": "dcutting@purplepixie.org"
     }
   ],
-  "description": "PHP DNS Direct Query Module.",
+  "description": "PHP DNS Direct Query Module. A updated fork of purplepixie/phpdns",
   "license": "LGPL-3.0-or-later",
   "require": {
     "php": ">=5.6"
