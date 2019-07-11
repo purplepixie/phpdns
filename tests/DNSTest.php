@@ -5,34 +5,18 @@ use PurplePixie\PhpDns\DNSQuery;
 
 class DNSTest extends TestCase
 {
-	/**
-	 * @covers \PurplePixie\PhpDns\DNSQuery::__construct
-	 */
 	public function testConstructor()
 	{
 		$d = new DNSQuery("127.0.0.1");
 		$this->assertInstanceOf('PurplePixie\\PhpDns\\DNSQuery', $d);
 	}
 
-	/**
-	 * @covers \PurplePixie\PhpDns\DNSQuery::__construct
-	 */
 	public function testConstructorNoServer()
 	{
         $this->expectException(\InvalidArgumentException::class);
 		$d = new DNSQuery();
-    }
-    
-	/**
-	 * @covers \PurplePixie\PhpDns\DNSResult::__construct
-	 * @covers \PurplePixie\PhpDns\DNSQuery::query
-	 * @covers \PurplePixie\PhpDns\DNSAnswer::count
-	 * @covers \PurplePixie\PhpDns\DNSResult::getData
-	 * @covers \PurplePixie\PhpDns\DNSResult::getType
-	 * @covers \PurplePixie\PhpDns\DNSResult::getTypeId
-	 * @covers \PurplePixie\PhpDns\DNSResult::getString
-	 * @covers \PurplePixie\PhpDns\DNSResult::getExtras
-	 */
+    	}
+
 	public function testDNSQueryAndDNSAnswer()
 	{
         $dns_server = "8.8.8.8"; // Our DNS Server
@@ -61,11 +45,6 @@ class DNSTest extends TestCase
         }
     }
 
-	/**
-	 * @covers \PurplePixie\PhpDns\DNSQuery::setError
-	 * @covers \PurplePixie\PhpDns\DNSQuery::hasError
-	 * @covers \PurplePixie\PhpDns\DNSQuery::getLastError
-	 */
 	public function testDNSQueryAndDNSAnswerErrorServer()
 	{
         $dns_server = "127.0.0.1"; // Our DNS Server
@@ -83,9 +62,6 @@ class DNSTest extends TestCase
 		}
 	}
 
-	/**
-	 * @covers \PurplePixie\PhpDns\DNSTypes::getByName
-	 */
 	public function testDNSQueryAndDNSAnswerErrorType()
 	{
         $dns_server = "1.1.1.1"; // Our DNS Server
