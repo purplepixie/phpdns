@@ -136,7 +136,7 @@ class DNSQuery
      * @return DNSAnswer
      * @throws \Exception
      */
-    public function query($question, $type = 'A'): DNSAnswer
+    public function query($question, $type = 'A')
     {
         $this->clearError();
 
