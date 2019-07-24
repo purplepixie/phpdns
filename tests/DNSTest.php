@@ -5,30 +5,30 @@ use PurplePixie\PhpDns\DNSQuery;
 
 class DNSTest extends TestCase
 {
-	public function testConstructor()
-	{
-		$d = new DNSQuery("127.0.0.1");
-		$this->assertInstanceOf('PurplePixie\\PhpDns\\DNSQuery', $d);
+    public function testConstructor()
+    {
+        $d = new DNSQuery("127.0.0.1");
+        $this->assertInstanceOf(PurplePixie\PhpDns\DNSQuery::class, $d);
 	}
 
-	public function testConstructorNoServer()
-	{
+    public function testConstructorNoServer()
+    {
         $this->expectException(\InvalidArgumentException::class);
-		$d = new DNSQuery();
-    	}
+        $d = new DNSQuery();
+    }
 
-	public function testDNSQueryAndDNSAnswer()
-	{
+    public function testDNSQueryAndDNSAnswer()
+    {
         $dns_server = "8.8.8.8"; // Our DNS Server
 
         $dns_query = new DNSQuery($dns_server); // create DNS Query object - there are other options we could pass here
-		$this->assertInstanceOf('PurplePixie\\PhpDns\\DNSQuery', $dns_query);
+        $this->assertInstanceOf(PurplePixie\PhpDns\DNSQuery::class, $dns_query);
 
         $question = "msn.com"; // the question we will ask
         $type = "A"; // the type of response(s) we want for this question
 
         $result = $dns_query->query($question, $type); // do the query
-		$this->assertInstanceOf('PurplePixie\\PhpDns\\DNSAnswer', $result);
+		$this->assertInstanceOf(PurplePixie\PhpDns\DNSAnswer::class, $result);
 
         //Process Results
         $count = $result->count(); // number of results returned
@@ -40,13 +40,13 @@ class DNSTest extends TestCase
                 $this->assertEquals(1, $result_count->getTypeId());
                 $this->assertEquals('13.82.28.61', $result_count->getData());
                 $this->assertEquals('msn.com has IPv4 address 13.82.28.61', $result_count->getString());
-                $this->assertEquals(1, count($result_count->getExtras()));
+                $this->assertCount(1, $result_count->getExtras());
             }
         }
     }
 
-	public function testDNSQueryAndDNSAnswerErrorServer()
-	{
+    public function testDNSQueryAndDNSAnswerErrorServer()
+    {
         $dns_server = "127.0.0.1"; // Our DNS Server
 
         $dns_query = new DNSQuery($dns_server);
@@ -54,16 +54,16 @@ class DNSTest extends TestCase
         $type = "A";
 
         // Trap Errors
-		try {
-        	$result = $dns_query->query($question, $type); // do the query
-		} catch(\Exception $e) {
-			$this->assertEquals('Failed to read data buffer', $dns_query->getLastError());
-			$this->assertTrue($dns_query->hasError());
-		}
-	}
+        try {
+            $result = $dns_query->query($question, $type); // do the query
+        } catch(\Exception $e) {
+            $this->assertEquals('Failed to read data buffer', $dns_query->getLastError());
+            $this->assertTrue($dns_query->hasError());
+        }
+    }
 
-	public function testDNSQueryAndDNSAnswerErrorType()
-	{
+    public function testDNSQueryAndDNSAnswerErrorType()
+    {
         $dns_server = "1.1.1.1"; // Our DNS Server
 
         $dns_query = new DNSQuery($dns_server);
@@ -71,15 +71,15 @@ class DNSTest extends TestCase
         $type = "BAD";
 
         // Trap Errors
-		try {
-        	$result = $dns_query->query($question, $type); // do the query
-		} catch(\Exception $e) {
-			$this->assertEquals('Invalid Query Type BAD', $dns_query->getLastError());
-		}
+        try {
+            $result = $dns_query->query($question, $type); // do the query
+        } catch(\Exception $e) {
+            $this->assertEquals('Invalid Query Type BAD', $dns_query->getLastError());
+        }
 	}
 
-	public function testDNSQueryAndDNSAnswerErrorOpen()
-	{
+    public function testDNSQueryAndDNSAnswerErrorOpen()
+    {
         $dns_server = "tcp:://127.1.1.1"; // Our DNS Server
 
         $dns_query = new DNSQuery($dns_server, 53, 5, false);
@@ -87,10 +87,10 @@ class DNSTest extends TestCase
         $type = "A";
 
         // Trap Errors
-		try {
-        	$result = $dns_query->query($question, $type); // do the query
-		} catch(\Exception $e) {
-			$this->assertEquals('Failed to Open Socket', $dns_query->getLastError());
-		}
-	}
+        try {
+            $result = $dns_query->query($question, $type); // do the query
+        } catch(\Exception $e) {
+            $this->assertEquals('Failed to Open Socket', $dns_query->getLastError());
+        }
+    }
 }
