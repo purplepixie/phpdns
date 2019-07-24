@@ -1,8 +1,6 @@
 ﻿# phpdns
 
-[![Build Status](https://travis-ci.org/techno-express/phpdns.svg?branch=master)](https://travis-ci.org/techno-express/phpdns)
-
-> It seems original authors [purplepixie/phpdns](https://github.com/purplepixie/phpdns) has left there **repo** unmaintained for over 3 years now.
+[![Build Status](https://travis-ci.org/purplepixie/phpdns.svg?branch=master)](https://travis-ci.org/purplepixie/phpdns)
 
 The PHP DNS Query is a GPL set of PHP classes providing a direct domain name service API. Originally developed to be a testing module for the [FreeNATS](http://www.purplepixie.org/freenats/) network monitor I decided to package it up as a standalone API as well.
 
