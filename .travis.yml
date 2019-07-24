@@ -14,6 +14,7 @@ matrix:
 
 before_script:
   - composer self-update
+  - composer require php-coveralls/php-coveralls
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
