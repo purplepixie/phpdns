@@ -13,6 +13,7 @@ matrix:
   fast_finish: true
 
 before_script:
+  - composer install
   - composer self-update
 
 after_success:
