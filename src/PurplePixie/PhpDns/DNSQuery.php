@@ -197,12 +197,12 @@ class DNSQuery
             ' TTL ' . $ans_header['ttl'] . ' Length ' . $ans_header['length']
         );
 
-        $typeid = $this->types->getById($ans_header['type']);
+        $type = $this->types->getById($ans_header['type']);
         $extras = array();
         $data = '';
         $string = '';
 
-        switch ($typeid) {
+        switch ($type) {
             case 'A':
                 $ipbin = $this->readResponse(4);
                 $ip = inet_ntop($ipbin);
@@ -308,14 +308,14 @@ class DNSQuery
                 break;
         }
 
-        return array(
+        return [
             'header' => $ans_header,
-            'typeid' => $typeid,
-            'data' => $data,
+            'typeid' => $this->types->getByName($type),
+            'data'   => $data,
             'domain' => $domain,
             'string' => $string,
-            'extras' => $extras
-        );
+            'extras' => $extras,
+        ];
     }
 
     /**
