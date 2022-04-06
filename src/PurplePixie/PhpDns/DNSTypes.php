@@ -24,7 +24,7 @@ namespace PurplePixie\PhpDns;
  */
 class DNSTypes
 {
-    private $types = array(
+    private array $types = [
         1 => 'A', // RFC 1035 (Address Record)
         2 => 'NS', // RFC 1035 (Name Server Record)
         5 => 'CNAME', // RFC 1035 (Canonical Name Record (Alias))
@@ -62,13 +62,9 @@ class DNSTypes
         255 => 'ANY', // RFC 1035 AKA "*" (Pseudo Record)
         32768 => 'TA', // (DNSSEC Trusted Authorities)
         32769 => 'DLV', // RFC 4431 (DNSSEC Lookaside Validation)
-    );
+    ];
 
-    /**
-     * @param string $name
-     * @return int
-     */
-    public function getByName($name)
+    public function getByName(string $name): int
     {
         if (false !== $index = array_search($name, $this->types, true)) {
             return $index;
@@ -77,11 +73,7 @@ class DNSTypes
         return 0;
     }
 
-    /**
-     * @param int $id
-     * @return string
-     */
-    public function getById($id)
+    public function getById(int $id): string
     {
         if (isset($this->types[$id])) {
             return $this->types[$id];
@@ -90,10 +82,7 @@ class DNSTypes
         return '';
     }
 
-    /**
-     * @return array
-     */
-    public function getAllTypeNamesSorted()
+    public function getAllTypeNamesSorted(): array
     {
         $types = array_values($this->types);
         sort($types);

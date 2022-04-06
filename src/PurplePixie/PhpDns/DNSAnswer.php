@@ -27,11 +27,8 @@ class DNSAnswer implements \Countable, \Iterator
     /**
      * @var DNSResult[]
      */
-    private $results = array();
+    private array $results = array();
 
-    /**
-     * @param DNSResult $result
-     */
     public function addResult(DNSResult $result)
     {
         $this->results[] = $result;
@@ -39,20 +36,16 @@ class DNSAnswer implements \Countable, \Iterator
 
     /**
      * Countable
-     *
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->results);
     }
 
     /**
      * Iterator
-     *
-     * @return DNSResult
      */
-    public function current()
+    public function current(): DNSResult
     {
         return current($this->results);
     }
@@ -60,27 +53,23 @@ class DNSAnswer implements \Countable, \Iterator
     /**
      * Iterator
      */
-    public function next()
+    public function next(): void
     {
-        return next($this->results);
+        next($this->results);
     }
 
     /**
      * Iterator
-     *
-     * @return int
      */
-    public function key()
+    public function key(): int
     {
         return key($this->results);
     }
 
     /**
      * Iterator
-     *
-     * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return key($this->results) !== null;
     }
@@ -88,9 +77,8 @@ class DNSAnswer implements \Countable, \Iterator
     /**
      * Iterator
      */
-    public function rewind()
+    public function rewind(): void
     {
-        return reset($this->results);
+        reset($this->results);
     }
-
 }

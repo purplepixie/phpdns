@@ -24,95 +24,39 @@ namespace PurplePixie\PhpDns;
  */
 class DNSQuery
 {
-    /**
-     * @var string
-     */
-    private $server = '';
+    private string $server;
 
-    /**
-     * @var int
-     */
-    private $port;
+    private int $port;
 
-    /**
-     * @var int
-     */
-    private $timeout; // default set in constructor
+    private int $timeout; // default set in constructor
 
-    /**
-     * @var bool
-     */
-    private $udp;
+    private bool $udp;
 
-    /**
-     * @var bool
-     */
-    private $debug;
+    private bool $debug;
 
-    /**
-     * @var bool
-     */
-    private $binarydebug = false;
+    private bool $binarydebug;
 
-    /**
-     * @var DNSTypes
-     */
-    private $types;
+    private DNSTypes $types;
 
-    /**
-     * @var string
-     */
-    private $rawbuffer = '';
+    private string $rawbuffer = '';
 
-    /**
-     * @var string
-     */
-    private $rawheader = '';
+    private string $rawheader = '';
 
-    /**
-     * @var string
-     */
-    private $rawresponse = '';
+    private string $rawresponse = '';
 
-    /**
-     * @var array
-     */
-    private $header;
+    private array $header;
 
-    /**
-     * @var int
-     */
-    private $responsecounter = 0;
+    private int $responsecounter = 0;
 
-    /**
-     * @var DNSAnswer
-     */
-    private $lastnameservers;
+    private DNSAnswer $lastnameservers;
 
-    /**
-     * @var DNSAnswer
-     */
-    private $lastadditional;
+    private DNSAnswer $lastadditional;
 
-    /**
-     * @var bool
-     */
-    private $error = false;
+    private bool $error = false;
 
-    /**
-     * @var string
-     */
-    private $lasterror = '';
+    private string $lasterror = '';
 
-    /**
-     * @param string $server
-     * @param int $port
-     * @param int $timeout
-     * @param bool $udp
-     * @param bool $debug
-     * @param bool $binarydebug
-     */
-    public function __construct($server, $port = 53, $timeout = 60, $udp = true, $debug = false, $binarydebug = false)
+    public function __construct(string $server, int $port = 53, int $timeout = 60, bool $udp = true, bool $debug = false, bool $binarydebug = false)
     {
         $this->server = $server;
         $this->port = $port;
@@ -126,12 +70,7 @@ class DNSQuery
         $this->debug('DNSQuery Class Initialised');
     }
 
-    /**
-     * @param int $count
-     * @param string $offset
-     * @return string
-     */
-    private function readResponse($count = 1, $offset = '')
+    private function readResponse(int $count = 1, string $offset = ''): string
     {
         if ($offset == '') {
             // no offset so use and increment the ongoing counter
@@ -144,12 +83,7 @@ class DNSQuery
         return $return;
     }
 
-    /**
-     * @param int $offset
-     * @param int $counter
-     * @return array
-     */
-    private function readDomainLabels($offset, &$counter = 0)
+    private function readDomainLabels(int $offset, int &$counter = 0): array
     {
         $labels = array();
         $startoffset = $offset;
@@ -188,10 +122,7 @@ class DNSQuery
         return $labels;
     }
 
-    /**
-     * @return string
-     */
-    private function readDomainLabel()
+    private function readDomainLabel(): string
     {
         $count = 0;
         $labels = $this->readDomainLabels($this->responsecounter, $count);
@@ -204,20 +135,14 @@ class DNSQuery
         return $domain;
     }
 
-    /**
-     * @param string $text
-     */
-    private function debug($text)
+    private function debug(string $text): void
     {
         if ($this->debug) {
             echo $text . "\n";
         }
     }
 
-    /**
-     * @param string $data
-     */
-    function debugBinary($data)
+    function debugBinary(string $data): void
     {
         if (!$this->binarydebug) {
             return;
@@ -244,10 +169,7 @@ class DNSQuery
         }
     }
 
-    /**
-     * @param string $text
-     */
-    private function setError($text)
+    private function setError(string $text): void
     {
         $this->error = true;
         $this->lasterror = $text;
@@ -255,16 +177,13 @@ class DNSQuery
         $this->debug('Error: ' . $text);
     }
 
-    private function clearError()
+    private function clearError(): void
     {
         $this->error = false;
         $this->lasterror = '';
     }
 
-    /**
-     * @return array
-     */
-    private function readRecord()
+    private function readRecord(): array
     {
         // First the pesky domain names - maybe not so pesky though I suppose
 
@@ -301,10 +220,6 @@ class DNSQuery
                 break;
 
             case 'CNAME':
-                $data = $this->readDomainLabel();
-                $string = $domain . ' alias of ' . $data;
-                break;
-
             case 'DNAME':
                 $data = $this->readDomainLabel();
                 $string = $domain . ' alias of ' . $data;
@@ -375,8 +290,6 @@ class DNSQuery
 
             case 'TXT':
             case 'SPF':
-                $data = '';
-
                 for ($string_count = 0; strlen($data) + (1 + $string_count) < $ans_header['length']; $string_count++) {
                     $string_length = ord($this->readResponse(1));
                     $data .= $this->readResponse($string_length);
@@ -406,11 +319,9 @@ class DNSQuery
     }
 
     /**
-     * @param string $question
-     * @param string $type
      * @return DNSAnswer|false
      */
-    public function query($question, $type = 'A')
+    public function query(string $question, string $type = 'A')
     {
         $this->clearError();
 
@@ -459,10 +370,6 @@ class DNSQuery
                 $size = strlen($label);
                 $question_binary .= pack('C', $size); // size byte first
                 $question_binary .= $label; // then the label
-            } else {
-                //$size = 0;
-                //$question_binary.=pack('C',$size);
-                //$question_binary.=pack('C',$labels[$a]);
             }
         }
 
@@ -640,13 +547,7 @@ class DNSQuery
         return $dns_answer;
     }
 
-    /**
-     * @param string $hostname
-     * @param int $depth
-     *
-     * @return string
-     */
-    public function smartALookup($hostname, $depth = 0)
+    public function smartALookup(string $hostname, int $depth = 0): string
     {
         $this->debug('SmartALookup for ' . $hostname . ' depth ' . $depth);
 
@@ -708,34 +609,22 @@ class DNSQuery
         return $this->smartALookup($newtarget, $depth + 1);
     }
 
-    /**
-     * @return DNSAnswer
-     */
-    public function getLastnameservers()
+    public function getLastnameservers(): DNSAnswer
     {
         return $this->lastnameservers;
     }
 
-    /**
-     * @return DNSAnswer
-     */
-    public function getLastadditional()
+    public function getLastadditional(): DNSAnswer
     {
         return $this->lastadditional;
     }
 
-    /**
-     * @return boolean
-     */
-    public function hasError()
+    public function hasError(): bool
     {
         return $this->error;
     }
 
-    /**
-     * @return string
-     */
-    public function getLasterror()
+    public function getLasterror(): string
     {
         return $this->lasterror;
     }

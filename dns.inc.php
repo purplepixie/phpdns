@@ -27,4 +27,3 @@ require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSAnswer.php';
 require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSQuery.php';
 require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSResult.php';
 require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSTypes.php';
-?>
