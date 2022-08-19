@@ -82,7 +82,7 @@ if ($query->hasError()) {
 echo "Returned ".count($result)." Answers\n";
 
 foreach ($result as $index => $record) {
-    echo $index . ". " . $record->getTypeid() . "(" . $record->getType() . ") => " . $record->getData() . " [";
+    echo $index . ". " . $record->getTypeid() . "(" . $record->getTypename() . ") => " . $record->getData() . " [";
     echo $record->getString();
     echo "]\n";
 

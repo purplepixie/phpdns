@@ -132,7 +132,7 @@ function ShowSection(DNSAnswer $result)
         echo $index.". ";
 
         if ($record->getString()=="") {
-            echo $record->getTypeid() . "(" . $record->getType() . ") => " . $record->getData();
+            echo $record->getTypeid() . "(" . $record->getTypename() . ") => " . $record->getData();
         } else {
             echo $record->getString();
         }
@@ -140,7 +140,7 @@ function ShowSection(DNSAnswer $result)
         echo "\n";
 
         if ($extendanswer) {
-            echo " - record type = ".$record->getTypeid()." (# ".$record->getType().")\n";
+            echo " - record type = ".$record->getTypeid()." (# ".$record->getTypename().")\n";
             echo " - record data = ".$record->getData()."\n";
             echo " - record ttl = ".$record->getTtl()."\n";
 

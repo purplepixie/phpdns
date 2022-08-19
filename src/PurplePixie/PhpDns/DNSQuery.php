@@ -6,6 +6,7 @@ namespace PurplePixie\PhpDns;
  * This file is the PurplePixie PHP DNS Query Class
  *
  * The software is (C) Copyright 2008-16 PurplePixie Systems
+ * Copyright (C) 2022, Fabian Bett / Bett Ingenieure GmbH
  *
  * This is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -183,6 +184,10 @@ class DNSQuery
         $this->lasterror = '';
     }
 
+    /**
+     * @return array
+     * @throws Exceptions\InvalidQueryTypeId
+     */
     private function readRecord(): array
     {
         // First the pesky domain names - maybe not so pesky though I suppose
@@ -197,13 +202,14 @@ class DNSQuery
             ' TTL ' . $ans_header['ttl'] . ' Length ' . $ans_header['length']
         );
 
-        $type = $this->types->getById($ans_header['type']);
+        $typeId = $ans_header['type'];
+        
         $extras = array();
         $data = '';
         $string = '';
 
-        switch ($type) {
-            case 'A':
+        switch ($typeId) {
+            case DNSTypes::ID_A:
                 $ipbin = $this->readResponse(4);
                 $ip = inet_ntop($ipbin);
                 $data = $ip;
@@ -211,7 +217,7 @@ class DNSQuery
                 $string = $domain . ' has IPv4 address ' . $ip;
                 break;
 
-            case 'AAAA':
+            case DNSTypes::ID_AAAA:
                 $ipbin = $this->readResponse(16);
                 $ip = inet_ntop($ipbin);
                 $data = $ip;
@@ -219,14 +225,14 @@ class DNSQuery
                 $string = $domain . ' has IPv6 address ' . $ip;
                 break;
 
-            case 'CNAME':
-            case 'DNAME':
+            case DNSTypes::ID_CNAME:
+            case DNSTypes::ID_DNAME:
                 $data = $this->readDomainLabel();
                 $string = $domain . ' alias of ' . $data;
                 break;
 
-            case 'DNSKEY':
-            case 'KEY':
+            case DNSTypes::ID_DNSKEY:
+            case DNSTypes::ID_KEY:
                 $stuff = $this->readResponse(4);
 
                 // key type test 21/02/2014 DC
@@ -239,12 +245,12 @@ class DNSQuery
                 $string = $domain . ' KEY ' . $data;
                 break;
 
-            case "NSEC":
+            case DNSTypes::ID_NSEC:
                 $data=$this->ReadDomainLabel();
                 $string=$domain." points to ".$data;
                 break;
 
-            case 'MX':
+            case DNSTypes::ID_MX:
                 $prefs = $this->readResponse(2);
                 $prefs = unpack('nlevel', $prefs);
                 $extras['level'] = $prefs['level'];
@@ -252,18 +258,18 @@ class DNSQuery
                 $string = $domain . ' mailserver ' . $data . ' (pri=' . $extras['level'] . ')';
                 break;
 
-            case 'NS':
+            case DNSTypes::ID_NS:
                 $nameserver = $this->readDomainLabel();
                 $data = $nameserver;
                 $string = $domain . ' nameserver ' . $nameserver;
                 break;
 
-            case 'PTR':
+            case DNSTypes::ID_PTR:
                 $data = $this->readDomainLabel();
                 $string = $domain . ' points to ' . $data;
                 break;
 
-            case 'SOA':
+            case DNSTypes::ID_SOA:
                 // Label First
                 $data = $this->readDomainLabel();
                 $responsible = $this->readDomainLabel();
@@ -278,7 +284,7 @@ class DNSQuery
                 $string = $domain . ' SOA ' . $data . ' Serial ' . $extras['serial'];
                 break;
 
-            case 'SRV':
+            case DNSTypes::ID_SRV:
                 $prefs = $this->readResponse(6);
                 $prefs = unpack('npriority/nweight/nport', $prefs);
                 $extras['priority'] = $prefs['priority'];
@@ -288,8 +294,8 @@ class DNSQuery
                 $string = $domain . ' SRV ' . $data . ':' . $extras['port'] . ' (pri=' . $extras['priority'] . ', weight=' . $extras['weight'] . ')';
                 break;
 
-            case 'TXT':
-            case 'SPF':
+            case DNSTypes::ID_TXT:
+            case DNSTypes::ID_SPF:
                 for ($string_count = 0; strlen($data) + (1 + $string_count) < $ans_header['length']; $string_count++) {
                     $string_length = ord($this->readResponse(1));
                     $data .= $this->readResponse($string_length);
@@ -298,7 +304,7 @@ class DNSQuery
                 $string = $domain . ' TEXT "' . $data . '" (in ' . $string_count . ' strings)';
                 break;
 
-            case "NAPTR":
+            case DNSTypes::ID_NAPTR:
                 $buffer = $this->ReadResponse(4);
                 $extras = unpack("norder/npreference",$buffer);
                 $addonitial = $this->ReadDomainLabel();
@@ -310,7 +316,8 @@ class DNSQuery
 
         return [
             'header' => $ans_header,
-            'typeid' => $this->types->getByName($type),
+            'typeid' => $typeId,
+            'typename' => $this->types->getNameById($typeId),
             'data'   => $data,
             'domain' => $domain,
             'string' => $string,
@@ -320,17 +327,13 @@ class DNSQuery
 
     /**
      * @return DNSAnswer|false
+     * @throws Exceptions\InvalidQueryTypeName
      */
-    public function query(string $question, string $type = 'A')
+    public function query(string $question, string $typeName = DNSTypes::NAME_A)
     {
         $this->clearError();
 
-        $typeid = $this->types->getByName($type);
-
-        if ($typeid === false) {
-            $this->setError('Invalid Query Type ' . $type);
-            return false;
-        }
+        $typeid = $this->types->getIdFromName($typeName);
 
         if ($this->udp) {
             $host = 'udp://' . $this->server;
@@ -375,7 +378,7 @@ class DNSQuery
 
         $question_binary .= pack('C', 0); // end it off
 
-        $this->debug('Question: ' . $question . ' (type=' . $type . '/' . $typeid . ')');
+        $this->debug('Question: ' . $question . ' (type=' . $typeName . '/' . $typeid . ')');
 
         $id = rand(1, 255) | (rand(0, 255) << 8);    // generate the ID
 
@@ -476,9 +479,9 @@ class DNSQuery
         $tc = ($this->header['spec'] >> 9) & 1;
         $aa = ($this->header['spec'] >> 10) & 1;
         $opcode = ($this->header['spec'] >> 11) & 15;
-        $type = ($this->header['spec'] >> 15) & 1;
+        $typeName = ($this->header['spec'] >> 15) & 1;
 
-        $this->debug("ID=$id, Type=$type, OPCODE=$opcode, AA=$aa, TC=$tc, RD=$rd, RA=$ra, RCODE=$rcode");
+        $this->debug("ID=$id, Type=$typeName, OPCODE=$opcode, AA=$aa, TC=$tc, RD=$rd, RA=$ra, RCODE=$rcode");
 
         if ($tc == 1 && $this->udp) { // Truncation detected
             $this->setError('Response too big for UDP, retry with TCP');
@@ -512,7 +515,7 @@ class DNSQuery
 
             $dns_answer->addResult(
                 new DNSResult(
-                    $record['header']['type'], $record['typeid'], $record['header']['class'], $record['header']['ttl'],
+                    $record['typename'], $record['typeid'], $record['header']['class'], $record['header']['ttl'],
                     $record['data'], $record['domain'], $record['string'], $record['extras']
                 )
             );
@@ -525,7 +528,7 @@ class DNSQuery
 
             $this->lastnameservers->addResult(
                 new DNSResult(
-                    $record['header']['type'], $record['typeid'], $record['header']['class'], $record['header']['ttl'],
+                    $record['typename'], $record['typeid'], $record['header']['class'], $record['header']['ttl'],
                     $record['data'], $record['domain'], $record['string'], $record['extras']
                 )
             );
@@ -538,7 +541,7 @@ class DNSQuery
 
             $this->lastadditional->addResult(
                 new DNSResult(
-                    $record['header']['type'], $record['typeid'], $record['header']['class'], $record['header']['ttl'],
+                    $record['typename'], $record['typeid'], $record['header']['class'], $record['header']['ttl'],
                     $record['data'], $record['domain'], $record['string'], $record['extras']
                 )
             );
@@ -547,6 +550,12 @@ class DNSQuery
         return $dns_answer;
     }
 
+    /**
+     * @param string $hostname
+     * @param int $depth
+     * @return string
+     * @throws Exceptions\InvalidQueryTypeName
+     */
     public function smartALookup(string $hostname, int $depth = 0): string
     {
         $this->debug('SmartALookup for ' . $hostname . ' depth ' . $depth);
@@ -557,7 +566,7 @@ class DNSQuery
         }
 
         // The SmartALookup function will resolve CNAMES using the additional properties if possible
-        $answer = $this->query($hostname, 'A');
+        $answer = $this->query($hostname, DNSTypes::NAME_A);
 
         // failed totally
         if ($answer === false) {
@@ -571,13 +580,13 @@ class DNSQuery
 
         foreach ($answer as $record) {
             // found it
-            if ($record->getTypeid() == 'A') {
+            if ($record->getTypeid() == DNSTypes::ID_A) {
                 $best_answer = $record;
                 break;
             }
 
             // alias
-            if ($record->getTypeid() == 'CNAME') {
+            if ($record->getTypeid() == DNSTypes::ID_CNAME) {
                 $best_answer = $record;
                 // and keep going
             }
@@ -587,11 +596,11 @@ class DNSQuery
             return '';
         }
 
-        if ($best_answer->getTypeid() == 'A') {
+        if ($best_answer->getTypeid() == DNSTypes::ID_A) {
             return $best_answer->getData();
         } // got an IP ok
 
-        if ($best_answer->getTypeid() != 'CNAME') {
+        if ($best_answer->getTypeid() != DNSTypes::ID_CNAME) {
             return '';
         } // shouldn't ever happen
 
@@ -599,7 +608,10 @@ class DNSQuery
 
         // First is it in the additional section
         foreach ($this->lastadditional as $result) {
-            if (($result->getDomain() == $hostname) && ($result->getTypeid() == 'A')) {
+            if (
+                $result->getDomain() == $hostname
+                && $result->getTypeid() == DNSTypes::ID_A
+            ) {
                 return $result->getData();
             }
         }
