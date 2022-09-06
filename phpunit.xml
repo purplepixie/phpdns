@@ -8,16 +8,15 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="true"
-         bootstrap="../_ORMFramework_develop/phpunit_bootstrap.php"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
     <coverage processUncoveredFiles="true">
         <include>
-            <directory suffix=".php">./App/</directory>
+            <directory suffix=".php">./tests/</directory>
         </include>
     </coverage>
     <testsuites>
         <testsuite name="App Test Suite">
-            <directory>./AppTests/</directory>
+            <directory>./tests/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

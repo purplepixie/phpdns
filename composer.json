@@ -16,12 +16,15 @@
   "require": {
     "php": ">=7.4"
   },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5"
+  },
   "extra": {
     "branch-alias": {
       "dev-master": "2.0-dev"
     }
   },
-  "require-dev": {
-    "phpunit/phpunit": "^9.5"
+  "scripts": {
+    "test": "./vendor/bin/phpunit"
   }
 }

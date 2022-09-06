@@ -3,3 +3,4 @@ phpunit.phar
 test/
 build.md
 composer.lock
+.phpunit.result.cache
