@@ -7,7 +7,7 @@
     }
   ],
   "description": "PHP DNS Direct Query Module",
-  "license": "GPLv3",
+  "license": "GPL-3.0-only",
   "autoload": {
     "psr-0": {
       "PurplePixie": "src/"
