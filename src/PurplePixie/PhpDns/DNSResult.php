@@ -24,7 +24,7 @@ namespace PurplePixie\PhpDns;
  */
 class DNSResult
 {
-    private string $type;
+    private string $typename;
 
     private int $typeid;
 
@@ -40,9 +40,9 @@ class DNSResult
 
     private array $extras;
 
-    public function __construct(string $type, int $typeid, string $class, int $ttl, string $data, string $domain, string $string, array $extras)
+    public function __construct(string $typename, int $typeid, string $class, int $ttl, string $data, string $domain, string $string, array $extras)
     {
-        $this->type = $type;
+        $this->typename = $typename;
         $this->typeid = $typeid;
         $this->class = $class;
         $this->ttl = $ttl;
@@ -52,9 +52,21 @@ class DNSResult
         $this->extras = $extras;
     }
 
+    /**
+     * @deprecated
+     * @return string
+     */
     public function getType(): string
     {
-        return $this->type;
+        return $this->typename;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTypename(): string
+    {
+        return $this->typename;
     }
 
     public function getTypeid(): int
