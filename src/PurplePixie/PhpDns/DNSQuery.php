@@ -248,9 +248,22 @@ class DNSQuery
             case DNSTypes::ID_NSEC:
                 $data=$this->ReadDomainLabel();
                 $string=$domain." points to ".$data;
-                break;
+                break;     
+                
+            case "NSEC3PARAM":	
+                $stuff = $this->ReadResponse($ans_header['length']);
+                $test = unpack("calgo/nflags/Citer/clen/H*data", $stuff);
+                $extras['algorithm']=$test['algo'];
+                $extras['flags']=$test['flags'];
+                $extras['iterations']=$test['iter'];
+                $extras['length']=$test['len'];
 
+		            $data = $test['data'];
+                $string = $domain." KEY ".$data;
+                break;
+            
             case DNSTypes::ID_MX:
+            case 'MX':
                 $prefs = $this->readResponse(2);
                 $prefs = unpack('nlevel', $prefs);
                 $extras['level'] = $prefs['level'];
