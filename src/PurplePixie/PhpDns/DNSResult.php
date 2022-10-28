@@ -24,59 +24,25 @@ namespace PurplePixie\PhpDns;
  */
 class DNSResult
 {
-    /**
-     * @var string
-     */
-    private $type;
+    private string $typename;
 
-    /**
-     * @var int
-     */
-    private $typeid;
+    private int $typeid;
 
-    /**
-     * @var string
-     */
-    private $class;
+    private string $class;
 
-    /**
-     * @var int
-     */
-    private $ttl;
+    private int $ttl;
 
-    /**
-     * @var string
-     */
-    private $data;
+    private string $data;
 
-    /**
-     * @var string
-     */
-    private $domain;
+    private string $domain;
 
-    /**
-     * @var string
-     */
-    private $string;
+    private string $string;
 
-    /**
-     * @var array string
-     */
-    private $extras = array();
+    private array $extras;
 
-    /**
-     * @param string $type
-     * @param int $typeid
-     * @param string $class
-     * @param int $ttl
-     * @param string $data
-     * @param string $domain
-     * @param string $string
-     * @param array $extras
-     */
-    public function __construct($type, $typeid, $class, $ttl, $data, $domain, $string, array $extras)
+    public function __construct(string $typename, int $typeid, string $class, int $ttl, string $data, string $domain, string $string, array $extras)
     {
-        $this->type = $type;
+        $this->typename = $typename;
         $this->typeid = $typeid;
         $this->class = $class;
         $this->ttl = $ttl;
@@ -87,65 +53,53 @@ class DNSResult
     }
 
     /**
+     * @deprecated
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
-        return $this->type;
+        return $this->typename;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getTypeid()
+    public function getTypename(): string
+    {
+        return $this->typename;
+    }
+
+    public function getTypeid(): int
     {
         return $this->typeid;
     }
 
-    /**
-     * @return string
-     */
-    public function getClass()
+    public function getClass(): string
     {
         return $this->class;
     }
 
-    /**
-     * @return int
-     */
-    public function getTtl()
+    public function getTtl(): int
     {
         return $this->ttl;
     }
 
-    /**
-     * @return string
-     */
-    public function getData()
+    public function getData(): string
     {
         return $this->data;
     }
 
-    /**
-     * @return string
-     */
-    public function getDomain()
+    public function getDomain(): string
     {
         return $this->domain;
     }
 
-    /**
-     * @return string
-     */
-    public function getString()
+    public function getString(): string
     {
         return $this->string;
     }
 
-    /**
-     * @return array
-     */
-    public function getExtras()
+    public function getExtras(): array
     {
         return $this->extras;
     }

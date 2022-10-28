@@ -7,18 +7,24 @@
     }
   ],
   "description": "PHP DNS Direct Query Module",
-  "license": "GPLv3",
+  "license": "GPL-3.0-only",
   "autoload": {
     "psr-0": {
       "PurplePixie": "src/"
     }
   },
   "require": {
-    "php": ">=5.3.3"
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5"
   },
   "extra": {
     "branch-alias": {
       "dev-master": "2.0-dev"
     }
+  },
+  "scripts": {
+    "test": "./vendor/bin/phpunit"
   }
 }
