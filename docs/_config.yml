@@ -3,9 +3,14 @@ safe: true
 source: /docs
 incremental: false
 highlighter: rouge
-theme: slate
+remote_theme: pages-themes/slate@v0.2.0
+plugins:
+- jekyll-remote-theme # add this line to the plugins list if you already have one
 gist:
   noscript: false
 kramdown:
   math_engine: mathjax
   syntax_highlighter: rouge
+title: 'phpdns'
+description: 'PHP DNS Network Client'
+show_downloads: false
