@@ -5,7 +5,7 @@ namespace PurplePixie\PhpDns;
 /**
  * This file is the PurplePixie PHP DNS Answer Class
  *
- * The software is (C) Copyright 2008-16 PurplePixie Systems
+ * The software is (C) Copyright 2008-23 PurplePixie Systems
  *
  * This is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

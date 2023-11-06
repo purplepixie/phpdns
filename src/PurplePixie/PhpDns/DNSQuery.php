@@ -5,8 +5,8 @@ namespace PurplePixie\PhpDns;
 /**
  * This file is the PurplePixie PHP DNS Query Class
  *
- * The software is (C) Copyright 2008-16 PurplePixie Systems
- * Copyright (C) 2022, Fabian Bett / Bett Ingenieure GmbH
+ * The software is (C) Copyright 2008-23 PurplePixie Systems
+ * Some updates copyright (C) 2022, Fabian Bett / Bett Ingenieure GmbH
  *
  * This is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
