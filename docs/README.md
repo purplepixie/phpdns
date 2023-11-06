@@ -10,7 +10,7 @@
 
 The PHP DNS client is a GPL set of PHP classes originally developed by [David Cutting](https://davecutting.uk) providing a direct socket-level domain name service client API. Originally developed to be a testing module for the [FreeNATS network monitor](https://www.purplepixie.org/freenats/) it was decided to package it up as a standalone library as well.
 
-> Although there are plenty of other DNS classes/clients out there I found them to either be too overblown or actually non-functional. This API is intended to be a half-way house offering direct to-server queries, the ability to process the response in detail but still with a simple interface for the programmer. -- *David Cutting*
+> Although there are plenty of other DNS classes/clients out there I found them to either be too overblown or actually non-functional. This API is intended to be a half-way house offering direct-to-server queries, the ability to process the response in detail but still with a simple interface for the programmer. -- *David Cutting*
 
 The library is now held at [github.com/purplepixie/phpdns](https://github.com/purplepixie/phpdns/) and contains contributions from a number of people both credited in the commits and prior to moving to Github.
 
