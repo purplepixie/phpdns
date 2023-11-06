@@ -1,8 +1,8 @@
 # UNDER DEVELOPMENT
 
 **Note: this website content is currently under development - please continue to use the official links for the time being:**
-- Project Website: https://purplepixie.org/phpdns/
-- Code Repository: https://github.com/purplepixie/phpdns/
+- Project Website: [purplepixie.org/phpdns](https://purplepixie.org/phpdns/)
+- Code Repository: [github.com/purplepixie/phpdns](https://github.com/purplepixie/phpdns/)
 
 # phpdns: PHP DNS Client Library
 
@@ -22,7 +22,7 @@ The software is provided on an "as-is" basis without warranty or liability of an
 
 ## Errors and Bugs
 
-Should be reported through raising an [issue on Github](https://github.com/purplepixie/phpdns/issues).
+Should be reported through raising an [issue on Github](https://github.com/purplepixie/phpdns/issues). You are also very welcome to contribute fixes to the code (or documentation) via a PR.
 
 # Installing / Obtaining phpdns
 
@@ -72,3 +72,13 @@ $query = new DNSQuery("8.8.8.8");
 $result = $query->query('purplepixie.org', \PurplePixie\PhpDns\DNSTypes::NAME_A);
 print_r($result);
 ```
+
+# Using phpdns
+
+For usage examples and instructions please see the [user documentation](./usage.md). There is also a [technical reference document](./technical.md).
+
+# Contributing to phpdns
+
+Contributions to phpdns are very welcome and the codebase is made stronger by the many contributions we have already seen. Feel free to contribute via Pull Requests in github for the main codebase or the documentation (main codebase is in the ```master``` branch and other dev branches, the docs are in the ```website``` branch).
+
+If you have found phpdns particularly useful then please feel free to give us a star on Github and if you're feeling financially generous make a donation to a charity of your choice (phpdns is *free* software in every sense).
