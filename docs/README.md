@@ -1,9 +1,3 @@
-# UNDER DEVELOPMENT
-
-**Note: this website content is currently under development - please continue to use the official links for the time being:**
-- Project Website: [purplepixie.org/phpdns](https://purplepixie.org/phpdns/)
-- Code Repository: [github.com/purplepixie/phpdns](https://github.com/purplepixie/phpdns/)
-
 # phpdns: PHP DNS Client Library
 
 ## Overview
