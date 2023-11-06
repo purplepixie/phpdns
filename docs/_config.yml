@@ -3,6 +3,7 @@ safe: true
 source: /docs
 incremental: false
 highlighter: rouge
+theme: slate
 gist:
   noscript: false
 kramdown:
