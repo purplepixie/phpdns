@@ -1,5 +1,9 @@
-phpdns
-======
+# phpdns
+
+[![CI](https://github.com/purplepixie/phpdns/actions/workflows/phpunit.yml/badge.svg)](https://github.com/purplepixie/phpdns/actions/workflows/phpunit.yml)
+[![Latest Stable Version](https://poser.pugx.org/purplepixie/phpdns/v/stable)](https://packagist.org/packages/purpleixie/phpdns)
+[![Total Downloads](https://poser.pugx.org/purplepixie/phpdns/downloads)](https://packagist.org/packages/purplepixie/phpdns)
+[![License](https://poser.pugx.org/purplepixie/phpdns/license)](https://packagist.org/packages/purplepixie/phpdns)
 
 DNS Client API / Library for PHP by David Cutting - https://davecutting.uk/
 
