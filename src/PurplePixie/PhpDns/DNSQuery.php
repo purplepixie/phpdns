@@ -309,10 +309,15 @@ class DNSQuery
 
             case DNSTypes::ID_TXT:
             case DNSTypes::ID_SPF:
+                $data="";
                 for ($string_count = 0; strlen($data) + (1 + $string_count) < $ans_header['length']; $string_count++) {
                     $string_length = ord($this->readResponse(1));
                     $data .= $this->readResponse($string_length);
                 }
+
+                // test for TXT fix - skips the responsecounter ahead one in the event of a blank (len 1) TXT record
+                if ($ans_header['length']==1)
+                    $this->responsecounter++;
 
                 $string = $domain . ' TEXT "' . $data . '" (in ' . $string_count . ' strings)';
                 break;
