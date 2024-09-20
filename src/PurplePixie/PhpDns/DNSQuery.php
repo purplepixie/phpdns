@@ -208,6 +208,7 @@ class DNSQuery
         $data = '';
         $string = '';
 
+
         switch ($typeId) {
             case DNSTypes::ID_A:
                 $ipbin = $this->readResponse(4);
@@ -329,6 +330,17 @@ class DNSQuery
                 $data = $this->ReadDomainLabel();
                 $extras['service']=$addonitial;
                 $string = $domain." NAPTR ".$data;
+                break;
+            case DNSTypes::ID_CAA:
+                $prefs = $this->ReadResponse(2);
+                $prefs = unpack('Cflag/CtagLength/', $prefs);
+
+                $extras['flag'] = $prefs['flag'];
+                $extras['tag'] = $this->readResponse($prefs['tagLength']);
+                $extras['value'] = $this->readResponse($ans_header['length'] - 2 - $prefs['tagLength']);
+                $data = implode(' ', $extras);
+
+                $string = $domain . ' caa ' . $data . ' (flag=' . $extras['flag'] . ',tag=' . $extras['tag'] . ')';
                 break;
         }
 
@@ -511,6 +523,7 @@ class DNSQuery
         $this->debug('Query Returned ' . $answers . ' Answers');
 
         $dns_answer = new DNSAnswer();
+
 
         // Deal with the header question data
         if ($this->header['qdcount'] > 0) {
