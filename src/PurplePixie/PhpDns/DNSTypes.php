@@ -62,6 +62,7 @@ class DNSTypes
     const ID_ANY = 255;
     const ID_TA = 32768;
     const ID_DLV = 32769;
+    const ID_CAA = 257;
 
     const NAME_A = 'A';
     const NAME_NS = 'NS';
@@ -100,6 +101,7 @@ class DNSTypes
     const NAME_ANY = 'ANY';
     const NAME_TA = 'TA';
     const NAME_DLV = 'DLV';
+    const NAME_CAA = 'CAA';
 
     private array $types = [
         self::ID_A => self::NAME_A, // RFC 1035 (Address Record)
@@ -139,6 +141,7 @@ class DNSTypes
         self::ID_ANY => self::NAME_ANY, // RFC 1035 AKA "*" (Pseudo Record)
         self::ID_TA =>  self::NAME_TA, // (DNSSEC Trusted Authorities)
         self::ID_DLV => self::NAME_DLV, // RFC 4431 (DNSSEC Lookaside Validation)
+        self::ID_CAA => self::NAME_CAA, // RFC 6844 (Certification Authority Authorization)
     ];
 
     /**
