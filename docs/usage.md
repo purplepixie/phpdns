@@ -98,19 +98,11 @@ Each ```DNSResult``` object contains a lot of data, key items of which are:
 
 - ```DNSResult::getType()``` - returns a textual version of the record type (i.e. "A").
 - ```DNSResult::getTypeid()``` - returns the numeric record type which can be mapped to ```DNSType``` if supported.
-- ```DNSResult::getClass()```
-- ```DNSResult::getData()```
-- ```DNSResult::getDomain()```
-- ```DNSResult::getString()```
-- ```DNSResult::getExtras()```
-
-$answer->results[x]->typeid	Textual record type ID (A, MX, CNAME etc)
-$answer->results[x]->type	Numeric record type (decimal)
-$answer->results[x]->class	Numeric class type (decimal)
-$answer->results[x]->data	Data returned (i.e. IP address or hostname)
-$answer->results[x]->domain	Domain name data is for
-$answer->results[x]->string	String representation of the answer (i.e. www.fish.sea has address x.y.z)
-$answer->results[x]->extras	Type-specific array of extra fields (i.e. "level" for MX exchanges) - see below
+- ```DNSResult::getClass()``` - returns the numeric class type (decimal) .
+- ```DNSResult::getData()``` - returns the data returned by the query (i.e. IP address or hostname).
+- ```DNSResult::getDomain()``` - returns the domain name data is for.
+- ```DNSResult::getString()``` - returns a string representation of the answer (i.e. www.fish.sea has address x.y.z).
+- ```DNSResult::getExtras()``` - returns a specific array of extra fields (i.e. "level" for MX records) - see below.
 
 ### Type-specific Extras
 
@@ -127,14 +119,14 @@ SOA record types have the responsible contact for the domain in ```extras['respo
 - ```extras['minttl']``` - domain mimumum time-to-live (TTL)
 
 
-## Smart A Lookup
+## Smart A Lookup / Smart AAAA Lookup
 
-Because doing an A lookup won't always return an IP address and sometimes you're just after an IP address (not potentially a list of them and aliases etc) the ```DNSQuery``` class provides the ```DNSQuery::SmartALookup()``` method.
+Because doing an A/AAAA lookup won't always return an IP address and sometimes you're just after an IP address (not potentially a list of them and aliases etc) the ```DNSQuery``` class provides the ```DNSQuery::SmartALookup()``` and ```DNSQuery::SmartAAAALookup()``` methods.
 
-This function simply takes a hostname and returns an IP address or a null string if lookup failed (you can then check the ```DNSQuery``` error property to see if the query actually failed or just returned no results).
+These methods takes a hostname (and an optional recursion depth which defaults to 5 if not passed) and returns an IPv4/v6 address or a null string if lookup failed (you can then check the ```DNSQuery``` error property to see if the query actually failed or just returned no results).
 
 If the result data contains an IP address it will be returned (first preference). If no IP addresses were provided but an alias CNAME is given then this will be looked up (recursing up to a depth of five aliases; with requests to the same DNS server).
 
 In effect this is a nameserver-specific version of [gethostbyname()](https://www.php.net/manual/en/function.gethostbyname.php) but returns a null string rather than the unmodified IP on failure.
 
-**Note:** Smart A Lookup only works on a single server, if you want to do a recursive resolution to different nameservers you will need to do that yourself; see the example on the [examples page](./examples).
+**Note:** Smart A/AAAA Lookup only works on a single server, if you want to do a recursive resolution to different nameservers you will need to do that yourself; see the example on the [examples page](./examples).
