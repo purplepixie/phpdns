@@ -652,6 +652,77 @@ class DNSQuery
         return $this->smartALookup($newtarget, $depth + 1);
     }
 
+    /**
+     * @param string $hostname
+     * @param int $depth
+     * @return string
+     * @throws Exceptions\InvalidQueryTypeName
+     */
+    public function smartAAAALookup(string $hostname, int $depth = 0): string
+    {
+        $this->debug('SmartAAAALookup for ' . $hostname . ' depth ' . $depth);
+
+        // avoid recursive lookups
+        if ($depth > 5) {
+            return '';
+        }
+
+        // The SmartALookup function will resolve CNAMES using the additional properties if possible
+        $answer = $this->query($hostname, DNSTypes::NAME_AAAA);
+
+        // failed totally
+        if ($answer === false) {
+            return '';
+        }
+
+        // no records at all returned
+        if (count($answer) === 0) {
+            return '';
+        }
+
+        foreach ($answer as $record) {
+            // found it
+            if ($record->getTypeid() == DNSTypes::ID_AAAA) {
+                $best_answer = $record;
+                break;
+            }
+
+            // alias
+            if ($record->getTypeid() == DNSTypes::ID_CNAME) {
+                $best_answer = $record;
+                // and keep going
+            }
+        }
+
+        if (!isset($best_answer)) {
+            return '';
+        }
+
+        if ($best_answer->getTypeid() == DNSTypes::ID_AAAA) {
+            return $best_answer->getData();
+        } // got an IP ok
+
+        if ($best_answer->getTypeid() != DNSTypes::ID_CNAME) {
+            return '';
+        } // shouldn't ever happen
+
+        $newtarget = $best_answer->getData(); // this is what we now need to resolve
+
+        // First is it in the additional section
+        foreach ($this->lastadditional as $result) {
+            if (
+                $result->getDomain() == $hostname
+                && $result->getTypeid() == DNSTypes::ID_AAAA
+            ) {
+                return $result->getData();
+            }
+        }
+
+        // Not in the results
+
+        return $this->smartALookup($newtarget, $depth + 1);
+    }
+
     public function getLastnameservers(): DNSAnswer
     {
         return $this->lastnameservers;
