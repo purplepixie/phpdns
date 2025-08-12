@@ -5,7 +5,7 @@ namespace PurplePixie\PhpDns;
 /**
  * This file is the PurplePixie PHP DNS Types Class
  *
- * The software is (C) Copyright 2008-23 PurplePixie Systems
+ * The software is (C) Copyright 2008-25 PurplePixie Systems
  * Some updates copyright (C) 2022, Fabian Bett / Bett Ingenieure GmbH
  *
  * This is free software: you can redistribute it and/or modify
