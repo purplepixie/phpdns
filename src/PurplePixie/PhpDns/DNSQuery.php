@@ -374,8 +374,14 @@ class DNSQuery
         $errno = 0;
         $errstr = '';
 
-        if (!$socket = fsockopen($host, $this->port, $errno, $errstr, $this->timeout)) {
-            $this->setError('Failed to Open Socket');
+        if (!$socket = @fsockopen(
+                $host, 
+                $this->port, 
+                $errno, 
+                $errstr, 
+                $this->timeout)) 
+        {
+            $this->setError('Failed to Open Socket (Code '.$errno.', Message: '.$errstr.')');
             return false;
         }
 
