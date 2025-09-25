@@ -23,6 +23,8 @@ use PHPUnit\Framework\TestCase;
 
 use PurplePixie\PhpDns\DNSQuery;
 
+use PurplePixie\PhpDns\DNSTypes;
+
 class DNSQueryTest extends TestCase
 {
     /**
@@ -34,6 +36,14 @@ class DNSQueryTest extends TestCase
         $query = new DNSQuery("8.8.8.8");
         $this->expectException(\PurplePixie\PhpDns\Exceptions\InvalidQueryTypeName::class);
         $query->query('google.com', 'invalid');
+    }
+
+    public function testConnectionExceptionTCP(): void
+    {
+        $query = new DNSQuery("127.0.0.1", 53, 60, false);
+        $query->setConnectionException(true);
+        $this->expectException(\PurplePixie\PhpDns\Exceptions\ConnectionFailure::class);
+        $query->query('google.com', DNSTypes::NAME_A);
     }
 
     public function testALookup() : void {
