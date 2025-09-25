@@ -130,3 +130,43 @@ If the result data contains an IP address it will be returned (first preference)
 In effect this is a nameserver-specific version of [gethostbyname()](https://www.php.net/manual/en/function.gethostbyname.php) but returns a null string rather than the unmodified IP on failure.
 
 **Note:** Smart A/AAAA Lookup only works on a single server, if you want to do a recursive resolution to different nameservers you will need to do that yourself; see the example on the [examples page](./examples).
+
+## Error Handling
+
+By default the ```DNSQuery``` class will return errors by (1) return a boolean ```false``` result to a method call, (2) setting the error flag and (3) putting a message into the ```lastError``` buffer.
+
+The easiest way to check if an error occured in the last transaction therefore is to check the result of the ```hasError()``` method.
+
+```php
+$query = new DNSQuery("some.server.com");
+$answer = $query->query("a.question.here", DNSTypes::NAME_A);
+if ($query->hasError())
+{
+    // error handling code goes here
+    echo "Error: ".$query->getLasterror()."\n";
+}
+```
+
+In the above example assuming that a fatal error occured the ```$answer``` would be a boolean ```false``` also (though there are times where an error can occur but an answer is still returned).
+
+There are some errors which will throw exceptions such as an invalid or unknown type being used in a query.
+
+Connection errors can **optionally** throw an exception with a message (in which case the ```hasError()``` flag will also be set, with the message both in the exception and in the ```lastError``` buffer).
+
+This behaviour can be triggered by setting the ```ConnectionException``` flag using ```setConnectionException(true)```.
+
+```php
+$query = new DNSQuery("some.server.com");
+
+$query->setConnectionException(true);
+
+try
+{
+    $a = $query->query("a.question.here", DNSTypes::NAME_A);
+}
+catch(\Exception $e)
+{
+    // error handling
+    print_r($e);
+}
+```
