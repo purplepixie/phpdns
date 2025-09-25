@@ -57,6 +57,8 @@ class DNSQuery
 
     private string $lasterror = '';
 
+    private bool $connectionException = false;
+
     public function __construct(string $server, int $port = 53, int $timeout = 60, bool $udp = true, bool $debug = false, bool $binarydebug = false)
     {
         $this->server = $server;
@@ -357,7 +359,7 @@ class DNSQuery
 
     /**
      * @return DNSAnswer|false
-     * @throws Exceptions\InvalidQueryTypeName
+     * @throws Exceptions\InvalidQueryTypeName|Exceptions\ConnectionFailure
      */
     public function query(string $question, string $typeName = DNSTypes::NAME_A)
     {
@@ -374,8 +376,16 @@ class DNSQuery
         $errno = 0;
         $errstr = '';
 
-        if (!$socket = fsockopen($host, $this->port, $errno, $errstr, $this->timeout)) {
-            $this->setError('Failed to Open Socket');
+        if (!$socket = @fsockopen(
+                $host, 
+                $this->port, 
+                $errno, 
+                $errstr, 
+                $this->timeout)) 
+        {
+            $this->setError('Failed to Open Socket (Code '.$errno.', Message: '.$errstr.')');
+            if ($this->getConnectionException())
+                throw new Exceptions\ConnectionFailure('Failed to Open Socket (Code '.$errno.', Message: '.$errstr.')");');
             return false;
         }
 
@@ -741,5 +751,15 @@ class DNSQuery
     public function getLasterror(): string
     {
         return $this->lasterror;
+    }
+
+    public function getConnectionException(): bool
+    {
+        return $this->connectionException;
+    }
+
+    public function setConnectionException(bool $value): void
+    {
+        $this->connectionException = $value;
     }
 }
