@@ -2,7 +2,7 @@
 /* -------------------------------------------------------------
 This file is the PurplePixie PHP DNS Query Classes
 
-The software is (C) Copyright 2008-2016 PurplePixie Systems
+The software is (C) Copyright 2008-2025 PurplePixie Systems
 
 This is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,3 +27,7 @@ require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSAnswer.php';
 require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSQuery.php';
 require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSResult.php';
 require_once __DIR__ . '/src/PurplePixie/PhpDns/DNSTypes.php';
+
+require_once __DIR__ . '/src/PurplePixie/PhpDns/Exceptions/InvalidQueryTypeId.php';
+require_once __DIR__ . '/src/PurplePixie/PhpDns/Exceptions/InvalidQueryTypeName.php';
+require_once __DIR__ . '/src/PurplePixie/PhpDns/Exceptions/ConnectionFailure.php';
