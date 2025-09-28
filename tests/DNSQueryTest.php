@@ -2,6 +2,7 @@
 
 /**
  * Copyright (C) 2022, Fabian Bett / Bett Ingenieure GmbH
+ * Additions made Copyright (C) 2025 David Cutting
  *
  * This is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +41,7 @@ class DNSQueryTest extends TestCase
 
     public function testConnectionExceptionTCP(): void
     {
-        $query = new DNSQuery("127.0.0.1", 53, 60, false);
+        $query = new DNSQuery("0.0.0.0", 53, 60, false);
         $query->setConnectionException(true);
         $this->expectException(\PurplePixie\PhpDns\Exceptions\ConnectionFailure::class);
         $query->query('google.com', DNSTypes::NAME_A);
