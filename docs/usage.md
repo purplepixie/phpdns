@@ -170,3 +170,27 @@ catch(\Exception $e)
     print_r($e);
 }
 ```
+
+## RCODE in Answer
+
+DNS servers will return in their answer a Response Code (RCODE) from [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt) defined as follows:
+
+```
+RCODE           Response code - this 4 bit field is set as part of responses.  The values have the following interpretation:
+
+0               No error condition
+
+1               Format error - The name server was unable to interpret the query.
+
+2               Server failure - The name server was unable to process this query due to a problem with the name server.
+
+3               Name Error - Meaningful only for responses from an authoritative name server, this code signifies that the domain name referenced in the query does not exist.
+
+4               Not Implemented - The name server does not support the requested kind of query.
+
+5               Refused - The name server refuses to perform the specified operation for policy reasons.  For example, a name server may not wish to provide the information to the particular requester, or a name server may not wish to perform a particular operation (e.g., zone transfer) for particular data.
+
+6-15            Reserved for future use.
+```
+
+Once a ```DNSAnswer``` object is returned the RCODE can be read through ```DNSAnswer::getRcode()``` to get the numeric value and a brief English textual description of the code can be fetched through ```DNSAnswer::getRcodeDescription()```. Note that the default initialised value in ```DNSAnswer``` is ```-1``` which indicates that no answer has been returned/lookup performed.
