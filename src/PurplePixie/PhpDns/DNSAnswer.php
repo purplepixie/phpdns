@@ -29,6 +29,8 @@ class DNSAnswer implements \Countable, \Iterator
      */
     private array $results = array();
 
+    private int $rcode = -1;
+
     public function addResult(DNSResult $result)
     {
         $this->results[] = $result;
@@ -80,5 +82,36 @@ class DNSAnswer implements \Countable, \Iterator
     public function rewind(): void
     {
         reset($this->results);
+    }
+
+    /** 
+     * rcode getter and setter
+     */
+    public function getRcode(): int
+    {
+        return $this->rcode;
+    }
+
+    public function getRcodeDescription(): string // from RFC 1035
+    {
+        switch($this->rcode) 
+        {
+            case -1: return "Untested"; // untested (default initialised value i.e. no response)
+
+            case 0: return "No error condition"; // ok
+            case 1: return "Format error"; // format error
+            case 2: return "Server failure"; // server failure
+            case 3: return "Name error"; // name error
+            case 4: return "Not implemented"; // not implemented
+            case 5: return "Refused"; // refused
+            
+            default:
+                return "Unknown"; // unknown/undefined error code
+        }
+    }
+
+    public function setRcode(int $value): void
+    {
+        $this->rcode = $value;
     }
 }
