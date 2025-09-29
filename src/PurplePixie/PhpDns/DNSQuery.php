@@ -534,6 +534,8 @@ class DNSQuery
 
         $dns_answer = new DNSAnswer();
 
+        $dns_answer->setRcode($rcode);
+
 
         // Deal with the header question data
         if ($this->header['qdcount'] > 0) {
