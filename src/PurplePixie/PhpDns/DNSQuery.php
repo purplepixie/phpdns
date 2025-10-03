@@ -197,6 +197,7 @@ class DNSQuery
         $domain = $this->readDomainLabel();
 
         $ans_header_bin = $this->readResponse(10); // 10 byte header
+        
         $ans_header = unpack('ntype/nclass/Nttl/nlength', $ans_header_bin);
 
         $this->debug(
@@ -236,6 +237,7 @@ class DNSQuery
 
             case DNSTypes::ID_DNSKEY:
             case DNSTypes::ID_KEY:
+            case DNSTypes::ID_DS:
                 $stuff = $this->readResponse(4);
 
                 // key type test 21/02/2014 DC
