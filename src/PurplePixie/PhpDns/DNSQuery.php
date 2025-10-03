@@ -200,10 +200,11 @@ class DNSQuery
         
         $ans_header = unpack('ntype/nclass/Nttl/nlength', $ans_header_bin);
 
-        $this->debug(
+        if (is_array($ans_header)) $this->debug(
             'Record Type ' . $ans_header['type'] . ' Class ' . $ans_header['class'] .
             ' TTL ' . $ans_header['ttl'] . ' Length ' . $ans_header['length']
         );
+        else $this->debug("Error unpacking answer header, no array returned.");
 
         $typeId = $ans_header['type'];
         
