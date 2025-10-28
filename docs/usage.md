@@ -171,6 +171,10 @@ catch(\Exception $e)
 }
 ```
 
+Sometimes (especially on UDP requests) data will be returned but the format is incorrect and thus the ``unpack()`` routine fails to find the right header.
+
+This will output an error and optionally throw an ``InvalidReponse`` exception if the flag is set with ``setResponseException(true)``.
+
 ## RCODE in Answer
 
 DNS servers will return in their answer a Response Code (RCODE) from [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt) defined as follows:
