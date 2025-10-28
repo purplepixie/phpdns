@@ -200,7 +200,7 @@ class DNSQuery
 
         $ans_header_bin = $this->readResponse(10); // 10 byte header
         
-        $ans_header = unpack('ntype/nclass/Nttl/nlength', $ans_header_bin);
+        $ans_header = @unpack('ntype/nclass/Nttl/nlength', $ans_header_bin);
 
         if ($ans_header === null || $ans_header === false || !is_array($ans_header)) // the unpack has failed - we assume an invalid return
         {
