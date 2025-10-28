@@ -59,6 +59,8 @@ class DNSQuery
 
     private bool $connectionException = false;
 
+    private bool $responseException = false;
+
     public function __construct(string $server, int $port = 53, int $timeout = 60, bool $udp = true, bool $debug = false, bool $binarydebug = false)
     {
         $this->server = $server;
@@ -188,7 +190,7 @@ class DNSQuery
 
     /**
      * @return array
-     * @throws Exceptions\InvalidQueryTypeId
+     * @throws Exceptions\InvalidQueryTypeId|Exceptions\InvalidResponse
      */
     private function readRecord(): array
     {
@@ -198,13 +200,32 @@ class DNSQuery
 
         $ans_header_bin = $this->readResponse(10); // 10 byte header
         
-        $ans_header = unpack('ntype/nclass/Nttl/nlength', $ans_header_bin);
+        $ans_header = @unpack('ntype/nclass/Nttl/nlength', $ans_header_bin);
 
-        if (is_array($ans_header)) $this->debug(
-            'Record Type ' . $ans_header['type'] . ' Class ' . $ans_header['class'] .
-            ' TTL ' . $ans_header['ttl'] . ' Length ' . $ans_header['length']
-        );
-        else $this->debug("Error unpacking answer header, no array returned.");
+        if ($ans_header === null || $ans_header === false || !is_array($ans_header)) // the unpack has failed - we assume an invalid return
+        {
+            $this->debug("Error unpacking answer header, no array returned.");
+
+            if ($this->responseException)
+                throw new Exceptions\InvalidResponse("Answer header invalid format or empty");
+
+            return [
+                'header' => [],
+                'typeid' => null,
+                'typename' => "",
+                'data'   => "",
+                'domain' => "",
+                'string' => "Error unpacking answer header",
+                'extras' => "",
+            ];
+        }
+        else
+        {
+            $this->debug(
+                'Record Type ' . $ans_header['type'] . ' Class ' . $ans_header['class'] .
+                ' TTL ' . $ans_header['ttl'] . ' Length ' . $ans_header['length']
+            );
+        }
 
         $typeId = $ans_header['type'];
         
@@ -766,5 +787,15 @@ class DNSQuery
     public function setConnectionException(bool $value): void
     {
         $this->connectionException = $value;
+    }
+
+    public function setResponseException(bool $value): void
+    {
+        $this->responseException = $value;
+    }
+
+    public function getResponseException(): bool
+    {
+        return $this->responseException;
     }
 }
