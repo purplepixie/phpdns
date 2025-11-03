@@ -383,7 +383,7 @@ class DNSQuery
 
     /**
      * @return DNSAnswer|false
-     * @throws Exceptions\InvalidQueryTypeName|Exceptions\ConnectionFailure
+     * @throws Exceptions\InvalidQueryTypeName|Exceptions\ConnectionFailure|Exceptions\InvalidResponse
      */
     public function query(string $question, string $typeName = DNSTypes::NAME_A)
     {
