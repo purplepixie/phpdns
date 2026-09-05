@@ -764,6 +764,66 @@ class DNSQuery
         return $this->lastnameservers;
     }
 
+    public function getServer(): string
+    {
+        return $this->server;
+    }
+
+    public function setServer(string $value): void
+    {
+        $this->server = $value;
+    }
+
+    public function getPort(): int
+    {
+        return $this->port;
+    }
+
+    public function setPort(int $value): void
+    {
+        $this->port = $value;
+    }
+
+    public function getTimeout(): int
+    {
+        return $this->timeout;
+    }
+
+    public function setTimeout(int $value): void
+    {
+        $this->timeout = $value;
+    }
+
+    public function getUdp(): bool
+    {
+        return $this->udp;
+    }
+
+    public function setUdp(bool $value): void
+    {
+        $this->udp = $value;
+    }
+
+    public function getDebug(): bool
+    {
+        return $this->debug;
+    }
+
+    public function setDebug(bool $value): void
+    {
+        $this->debug = $value;
+    }
+
+    public function getBinarydebug(): bool
+    {
+        return $this->binarydebug;
+    }
+
+    public function setBinarydebug(bool $value): void
+    {
+        $this->binarydebug = $value;
+    }
+
     public function getLastadditional(): DNSAnswer
     {
         return $this->lastadditional;

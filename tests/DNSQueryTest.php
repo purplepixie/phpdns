@@ -28,6 +28,32 @@ use PurplePixie\PhpDns\DNSTypes;
 
 class DNSQueryTest extends TestCase
 {
+    public function testQuerySettingsCanBeReadAndChanged(): void
+    {
+        $query = new DNSQuery('initial.server', 53, 60, true, false, false);
+
+        $this->assertSame('initial.server', $query->getServer());
+        $this->assertSame(53, $query->getPort());
+        $this->assertSame(60, $query->getTimeout());
+        $this->assertTrue($query->getUdp());
+        $this->assertFalse($query->getDebug());
+        $this->assertFalse($query->getBinarydebug());
+
+        $query->setServer('updated.server');
+        $query->setPort(5353);
+        $query->setTimeout(10);
+        $query->setUdp(false);
+        $query->setDebug(true);
+        $query->setBinarydebug(true);
+
+        $this->assertSame('updated.server', $query->getServer());
+        $this->assertSame(5353, $query->getPort());
+        $this->assertSame(10, $query->getTimeout());
+        $this->assertFalse($query->getUdp());
+        $this->assertTrue($query->getDebug());
+        $this->assertTrue($query->getBinarydebug());
+    }
+
     /**
      * @covers \PurplePixie\PhpDns\DNSQuery::query
      * @covers \PurplePixie\PhpDns\DNSTypes::getIdFromName
