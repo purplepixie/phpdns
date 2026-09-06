@@ -82,6 +82,51 @@ Hosts with just a CNAME alias will not be resolved to an IP address in the answe
 
 If you just want an IP address for a host then either PHP's inbuilt gethostbyname() or this API's SmartALookup() (see below) are probably what you're after rather than a full blown query.
 
+## DNS Query Options
+
+The ```DNSQuery``` constructor takes a number of options controlling how the query is made, all of which (other than the server itself) have sensible defaults and can also be read and changed after the object has been created using the corresponding getter and setter methods.
+
+```php
+public function __construct(string $server, int $port = 53, int $timeout = 60, bool $udp = true, bool $debug = false, bool $binarydebug = false)
+```
+
+- ```server``` - the hostname or IP address of the remote DNS server to query. There is no default, this is a required parameter.
+- ```port``` - the remote port to connect to on the DNS server. Defaults to ```53```, the standard DNS port.
+- ```timeout``` - the connection/response timeout in seconds. Defaults to ```60```.
+- ```udp``` - whether to use UDP (```true```, the default) or TCP (```false```) to make the query.
+- ```debug``` - whether to output debug information about the query process. Defaults to ```false```.
+- ```binarydebug``` - whether to output binary/hex debug information about the raw data sent and received. Defaults to ```false```.
+
+For example to query a server on a non-standard port over TCP with a shorter timeout:
+
+```php
+$query = new DNSQuery("some.server.com", 5353, 10, false);
+```
+
+### Getters and Setters
+
+Each of the above options (plus the server itself) can be read and changed after construction using the following methods:
+
+- ```DNSQuery::getServer()``` / ```DNSQuery::setServer(string $value)``` - the remote server hostname or IP address.
+- ```DNSQuery::getPort()``` / ```DNSQuery::setPort(int $value)``` - the remote port.
+- ```DNSQuery::getTimeout()``` / ```DNSQuery::setTimeout(int $value)``` - the connection/response timeout in seconds.
+- ```DNSQuery::getUdp()``` / ```DNSQuery::setUdp(bool $value)``` - whether UDP (```true```) or TCP (```false```) is used.
+- ```DNSQuery::getDebug()``` / ```DNSQuery::setDebug(bool $value)``` - whether debug output is enabled.
+- ```DNSQuery::getBinarydebug()``` / ```DNSQuery::setBinarydebug(bool $value)``` - whether binary/hex debug output is enabled.
+
+For example to change the port and switch to TCP after the object has already been created:
+
+```php
+$query = new DNSQuery("some.server.com");
+$query->setPort(5353);
+$query->setUdp(false);
+```
+
+There are two further boolean options, not passed to the constructor but with their own getters and setters, which control whether exceptions are thrown on connection or response errors (see the "Error Handling" section below for more detail):
+
+- ```DNSQuery::getConnectionException()``` / ```DNSQuery::setConnectionException(bool $value)``` - whether a connection error throws a ```ConnectionException```. Defaults to ```false```.
+- ```DNSQuery::getResponseException()``` / ```DNSQuery::setResponseException(bool $value)``` - whether an invalid response throws an ```InvalidResponse``` exception. Defaults to ```false```.
+
 ## Answer and Query Types
 
 Record (query and result) types the API supports and should return sensible data for numerous and include the major record types such as A, NS, PTR, MX, CNAME, TXT and SOA. For a full list see the [DNSTypes Class](https://github.com/purplepixie/phpdns/blob/master/src/PurplePixie/PhpDns/DNSTypes.php).
